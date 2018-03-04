@@ -10,26 +10,23 @@ ver = os.environ.get("PKGVER") or subprocess.run(['git', 'describe', '--tags'],
       stdout=subprocess.PIPE).stdout.decode().strip()
 
 setup(
-  name = 'todosrht',
+  name = 'dispatchsrht',
   packages = [
-      'todosrht',
-      'todosrht.types',
-      'todosrht.blueprints',
-      'todosrht.alembic',
-      'todosrht.alembic.versions'
+      'dispatchsrht',
+      'dispatchsrht.blueprints',
+      'dispatchsrht.tasks',
+      'dispatchsrht.types',
   ],
   version = ver,
-  description = 'todo.sr.ht website',
+  description = 'dispatch.sr.ht website',
   author = 'Drew DeVault',
   author_email = 'sir@cmpwn.com',
-  url = 'https://todo.sr.ht/~sircmpwn/todo.sr.ht',
-  install_requires = ['srht', 'flask-login', 'alembic'],
+  url = 'https://dispatch.sr.ht/~sircmpwn/dispatch.sr.ht',
   license = 'AGPL-3.0',
   package_data={
-      'todosrht': [
+      'dispatchsrht': [
           'templates/*.html',
           'static/*',
-          'emails/*'
       ]
   }
 )
