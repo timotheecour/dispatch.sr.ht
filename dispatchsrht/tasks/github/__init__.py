@@ -1,1 +1,2 @@
 import dispatchsrht.tasks.github.github_commit_to_build
+import dispatchsrht.tasks.github.github_pr_to_build

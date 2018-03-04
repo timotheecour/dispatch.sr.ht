@@ -111,7 +111,7 @@ def submit_build(hook, repo, commit):
         return "You have not authorized us to access your GitHub account", 401
     github = Github(auth.oauth_token)
     repo = github.get_repo(repo["full_name"])
-    commit = repo.get_commit(commit["id"])
+    commit = repo.get_commit(commit.get("sha") or commit.get("id"))
     git_commit = commit.commit
     manifest = repo.get_contents(".build.yml", ref=git_commit.sha)
     if not manifest:
