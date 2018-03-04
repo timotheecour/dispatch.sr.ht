@@ -146,7 +146,9 @@ class GitHubCommitToBuild(TaskDef):
         commit.create_status(
                 "success" if result["status"] == "success" else "failure",
                 _builds_sr_ht + "/job/" + str(result["id"]),
-                "builds.sr.ht job completed",
+                "builds.sr.ht job {}".format(
+                    "completed successfully" if result["status"] == "success"
+                        else "failed"),
                 context="builds.sr.ht")
         return "Sent build status to GitHub"
 
