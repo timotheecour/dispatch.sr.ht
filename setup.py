@@ -27,6 +27,7 @@ setup(
   package_data={
       'dispatchsrht': [
           'templates/*.html',
+          'templates/github_commit_to_build/configure.html',
           'static/*',
       ]
   }
