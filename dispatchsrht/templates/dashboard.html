@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h2>dispatch</h2>
+      <p>
+        Welcome back, {{ current_user.username }}!
+        This service allows you to integrate various sr.ht services with each
+        other or with external services.
+      </p>
+      <a
+        href="/configure"
+        class="btn btn-default btn-block"
+      >Configure new task</a>
+    </div>
+    <div class="col-md-8">
+      <form>
+        <input
+          name="search"
+          type="text"
+          placeholder="Search your tasks"
+          class="form-control"
+          value="{{ search if search else "" }}" />
+      </form>
+
+      <div class="tasks">
+        <div class="task">
+          <h4>
+            <a class="manage btn btn-default btn-sm" href="#">
+              Manage
+            </a>
+            wlroots:build GitHub pull requests
+          </h4>
+          <p>
+            <i class="fa fa-github"></i>
+            Pull requests
+            <i class="fa fa-arrow-right"></i>
+            builds.sr.ht
+          </p>
+        </div>
+        <div class="task">
+          <h4>
+            <a class="manage btn btn-default btn-sm" href="#">
+              Manage
+            </a>
+            wlroots:build GitHub commits
+          </h4>
+          <p>
+            <i class="fa fa-github"></i>
+            Commits
+            <i class="fa fa-arrow-right"></i>
+            builds.sr.ht
+          </p>
+        </div>
+        <div class="task">
+          <h4>
+            <a class="manage btn btn-default btn-sm" href="#">
+              Manage
+            </a>
+            chopsui:sync tickets
+          </h4>
+          <p>
+            <i class="fa fa-github"></i>
+            Issues
+            <i class="fa fa-arrows-h"></i>
+            todo.sr.ht
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

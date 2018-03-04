@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h2>dispatch</h2>
+      <p>
+        To configure a new dispatch task, select one from the list of available
+        tasks.
+      </p>
+    </div>
+    <div class="col-md-8">
+      <form>
+        <input
+          name="search"
+          type="text"
+          placeholder="Search available tasks"
+          class="form-control"
+          value="{{ search if search else "" }}" />
+      </form>
+
+      <div class="tasks configure">
+      {% for task in taskdefs() %}
+        <div class="task">
+          <h4>
+            <a
+              href="/{{ task.name }}/configure"
+              class="manage btn btn-default btn-lg"
+            >Configure task</a>
+            {{ task.description }}
+          </h4>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

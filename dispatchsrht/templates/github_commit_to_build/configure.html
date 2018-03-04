@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h2>dispatch</h2>
+      <p>
+        This task will run a builds.sr.ht job for each commit pushed to a
+        GitHub repository. The repository should provide the build manifest in
+        the same manner as a git.sr.ht repo (<a
+         href="https://man.sr.ht/builds.sr.ht/#gitsrht">docs</a>).
+      </p>
+    </div>
+    <div class="col-md-8">
+      <form>
+        <input
+          name="search"
+          type="text"
+          placeholder="Search your GitHub repos"
+          class="form-control"
+          value="{{ search if search else "" }}" />
+      </form>
+
+      <div class="tasks configure">
+      {% for repo in repos %}
+        <form class="task" method="POST">
+          <input type="hidden" name="repo" value="{{ repo.full_name }}" />
+          <h4>
+            <i class="fa fa-github"></i>
+            {% if repo.full_name not in existing %}
+            <button
+              type="submit"
+              class="manage btn btn-default btn-lg"
+            >Add task</button>
+            {% else %}
+            <button
+              class="manage btn btn-default btn-lg"
+              disabled
+            >Already configured</button>
+            {% endif %}
+            {{ repo.full_name }}
+            <a
+              href="{{ repo.html_url }}"
+              target="_blank"
+              rel="noopener"
+            ><i class="fa fa-external-link"></i></a>
+          </h4>
+        </form>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

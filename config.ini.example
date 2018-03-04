@@ -1,0 +1,63 @@
+#
+# dispatch.sr.ht config
+
+[server]
+#
+# Specifies the protocol (usually http or https) dispatch.sr.ht runs with.
+protocol=http
+#
+# Specifies the domain name dispatch.sr.ht is running on.
+domain=dispatch.sr.ht.local
+#
+# A secret key to encrypt session cookies with.
+secret-key=CHANGEME
+
+[debug]
+#
+# Address and port to bind the debug server to.
+debug-host=0.0.0.0
+debug-port=5005
+
+[sr.ht]
+#
+# Configures the SQLAlchemy connection string for the database.
+connection-string=postgresql://postgres@localhost/dispatch.sr.ht
+#
+# The name of your network of sr.ht-based sites
+site-name=sr.ht
+
+[network]
+#
+# Location of other sites in your network
+#
+# This isn't a hardcoded list, add or remove entries as you like. The upstream
+# sites do know about each other and will omit integrations if you leave out
+# the relevant site. Only meta is required.
+meta=http://meta.sr.ht.local
+git=http://git.sr.ht.local
+builds=http://builds.sr.ht.local
+todo=http://todo.sr.ht.local
+dispatch=http://dispatch.sr.ht.local
+
+[meta.sr.ht]
+oauth-client-id=CHANGEME
+oauth-client-secret=CHANGEME
+
+[builds.sr.ht]
+#
+# Fill this in with the oauth client ID builds.sr.ht uses for builds.sr.ht
+# integration
+oauth-client-id=
+
+[github]
+#
+# Fill this in with a registered GitHub OAuth client to enable GitHub
+# integration
+#
+# When you reigster the client, set the callback URL to:
+#
+# https://dispatch.sr.ht/github/callback
+#
+# Of course, replace the domain with your own.
+oauth-client-id=
+oauth-client-secret=
