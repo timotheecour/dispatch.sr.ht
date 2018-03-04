@@ -174,6 +174,7 @@ class GitHubCommitToBuild(TaskDef):
             return "quit yo hackin bullshit"
         task = Task()
         task.name = "{}::github_commit_to_build".format(repo.full_name)
+        task.user_id = current_user.id
         task._taskdef = "github_commit_to_build"
         db.session.add(task)
         db.session.flush()

@@ -7,4 +7,11 @@ class Task(Base):
     created = sa.Column(sa.DateTime, nullable=False)
     updated = sa.Column(sa.DateTime, nullable=False)
     name = sa.Column(sa.Unicode(1024), nullable=False)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey("user.id"), nullable=False)
+    user = sa.orm.relationship("User", backref=sa.orm.backref("tasks"))
     _taskdef = sa.Column("taskdef", sa.Unicode(1024), nullable=False)
+
+    @property
+    def taskdef(self):
+        from dispatchsrht.tasks.taskdef import taskdef_by_name
+        return taskdef_by_name(self._taskdef)

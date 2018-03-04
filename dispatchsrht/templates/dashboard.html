@@ -15,6 +15,11 @@
       >Configure new task</a>
     </div>
     <div class="col-md-8">
+      {% if not any(tasks) %}
+      <p class="text-muted">
+        You haven't created any tasks yet.
+      </p>
+      {% else %}
       <form>
         <input
           name="search"
@@ -25,49 +30,21 @@
       </form>
 
       <div class="tasks">
+        {% for task in tasks %}
         <div class="task">
           <h4>
             <a class="manage btn btn-default btn-sm" href="#">
               Manage
             </a>
-            wlroots:build GitHub pull requests
+            {{ task.name }}
           </h4>
           <p>
-            <i class="fa fa-github"></i>
-            Pull requests
-            <i class="fa fa-arrow-right"></i>
-            builds.sr.ht
+            {{ task.taskdef.description }}
           </p>
         </div>
-        <div class="task">
-          <h4>
-            <a class="manage btn btn-default btn-sm" href="#">
-              Manage
-            </a>
-            wlroots:build GitHub commits
-          </h4>
-          <p>
-            <i class="fa fa-github"></i>
-            Commits
-            <i class="fa fa-arrow-right"></i>
-            builds.sr.ht
-          </p>
-        </div>
-        <div class="task">
-          <h4>
-            <a class="manage btn btn-default btn-sm" href="#">
-              Manage
-            </a>
-            chopsui:sync tickets
-          </h4>
-          <p>
-            <i class="fa fa-github"></i>
-            Issues
-            <i class="fa fa-arrows-h"></i>
-            todo.sr.ht
-          </p>
-        </div>
+        {% endfor %}
       </div>
+      {% endif %}
     </div>
   </div>
 </div>
