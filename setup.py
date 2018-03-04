@@ -15,6 +15,7 @@ setup(
       'dispatchsrht',
       'dispatchsrht.blueprints',
       'dispatchsrht.tasks',
+      'dispatchsrht.tasks.github',
       'dispatchsrht.types',
   ],
   version = ver,
