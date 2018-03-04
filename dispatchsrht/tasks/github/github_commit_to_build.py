@@ -18,7 +18,7 @@ from srht.database import Base, db
 from srht.config import cfg
 from srht.validation import Validation
 from dispatchsrht.tasks import TaskDef
-from dispatchsrht.tasks.github.auth import githubloginrequired
+from dispatchsrht.tasks.github.auth import githubloginrequired, GitHubAuthorization
 from dispatchsrht.types import Task
 
 def _first_line(text):
