@@ -65,7 +65,7 @@ class GitHubPRToBuild(TaskDef):
         head = pr["head"]
         base = pr["base"]
         base_repo = base["repo"]
-        head_repo = base["repo"]
+        head_repo = head["repo"]
         return submit_build(hook, head_repo, head, base_repo)
 
     @blueprint.route("/configure")
