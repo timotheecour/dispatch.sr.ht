@@ -114,8 +114,9 @@ def submit_build(hook, repo, commit, base=None):
     github = Github(auth.oauth_token)
     repo = github.get_repo(repo["full_name"])
     base = github.get_repo(base["full_name"])
-    commit = repo.get_commit(commit.get("sha") or commit.get("id"))
-    base_commit = base.get_commit(commit.get("sha") or commit.get("id"))
+    sha = commit.get("sha") or commit.get("id")
+    commit = repo.get_commit(sha)
+    base_commit = base.get_commit(sha)
     git_commit = commit.commit
     manifest = repo.get_contents(".build.yml", ref=git_commit.sha)
     if not manifest:
