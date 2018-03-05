@@ -129,7 +129,7 @@ def submit_build(hook, repo, commit, base=None):
             repo.clone_url + "#" + git_commit.sha
         for source in manifest.sources
     ]
-    status = commit.create_status("pending", _builds_sr_ht,
+    status = base_commit.create_status("pending", _builds_sr_ht,
             "preparing builds.sr.ht job", context="builds.sr.ht")
     complete_url = completion_url(base.full_name, auth.oauth_token,
             commit.sha)
@@ -153,7 +153,7 @@ def submit_build(hook, repo, commit, base=None):
         return resp.text
     build_id = resp.json()["id"]
     build_url = _builds_sr_ht + "/job/" + str(build_id)
-    status = commit.create_status("pending", build_url,
+    status = base_commit.create_status("pending", build_url,
             "builds.sr.ht job is running", context="builds.sr.ht")
     return "Started build: " + build_url
 
