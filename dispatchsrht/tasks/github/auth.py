@@ -129,7 +129,7 @@ def submit_build(hook, repo, commit, base=None):
             repo.clone_url + "#" + git_commit.sha
         for source in manifest.sources
     ]
-    status = base_commit.create_status("pending", _builds_sr_ht,
+    status = commit.create_status("pending", _builds_sr_ht,
             "preparing builds.sr.ht job", context="builds.sr.ht")
     complete_url = completion_url(base.full_name, auth.oauth_token,
             commit.sha)
