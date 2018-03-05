@@ -64,8 +64,9 @@ class GitHubPRToBuild(TaskDef):
             return "Got update, but there are no new commits"
         head = pr["head"]
         base = pr["base"]
-        repo = base["repo"]
-        return submit_build(hook, repo, head, base)
+        base_repo = base["repo"]
+        head_repo = base["repo"]
+        return submit_build(hook, head_repo, head, base_repo)
 
     @blueprint.route("/configure")
     @githubloginrequired
