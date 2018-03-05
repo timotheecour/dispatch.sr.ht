@@ -104,14 +104,18 @@ _kdf = PBKDF2HMAC(
 _key = base64.urlsafe_b64encode(_kdf.derive(_secret_key.encode()))
 _fernet = Fernet(_key)
 
-def submit_build(hook, repo, commit):
+def submit_build(hook, repo, commit, base=None):
+    if base == None:
+        base = repo
     auth = GitHubAuthorization.query.filter(
         GitHubAuthorization.user_id == hook.user_id).first()
     if not auth:
         return "You have not authorized us to access your GitHub account", 401
     github = Github(auth.oauth_token)
     repo = github.get_repo(repo["full_name"])
+    base = github.get_repo(base["full_name"])
     commit = repo.get_commit(commit.get("sha") or commit.get("id"))
+    base_commit = base.get_commit(commit.get("sha") or commit.get("id"))
     git_commit = commit.commit
     manifest = repo.get_contents(".build.yml", ref=git_commit.sha)
     if not manifest:
@@ -124,9 +128,9 @@ def submit_build(hook, repo, commit):
             repo.clone_url + "#" + git_commit.sha
         for source in manifest.sources
     ]
-    status = commit.create_status("pending", _builds_sr_ht,
+    status = base_commit.create_status("pending", _builds_sr_ht,
             "preparing builds.sr.ht job", context="builds.sr.ht")
-    complete_url = completion_url(repo.full_name, auth.oauth_token,
+    complete_url = completion_url(base.full_name, auth.oauth_token,
             commit.sha)
     manifest.triggers.append(Trigger({
         "action": "webhook",
