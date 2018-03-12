@@ -104,7 +104,7 @@ _kdf = PBKDF2HMAC(
 _key = base64.urlsafe_b64encode(_kdf.derive(_secret_key.encode()))
 _fernet = Fernet(_key)
 
-def submit_build(hook, repo, commit, base=None):
+def submit_build(hook, repo, commit, base=None, secrets=True):
     if base == None:
         base = repo
     auth = GitHubAuthorization.query.filter(
@@ -145,7 +145,8 @@ def submit_build(hook, repo, commit, base=None):
             str(git_commit.sha)[:7], commit.url,
             git_commit.author.name,
             git_commit.author.email,
-        )
+        ),
+        "secrets": secrets,
     }, headers={
         "Authorization": "token " + hook.user.oauth_token,
     })
