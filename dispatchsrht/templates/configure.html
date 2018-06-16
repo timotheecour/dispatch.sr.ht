@@ -3,7 +3,6 @@
 <div class="container">
   <div class="row">
     <div class="col-md-4">
-      <h2>dispatch</h2>
       <p>
         To configure a new dispatch task, select one from the list of available
         tasks.
@@ -19,16 +18,20 @@
           value="{{ search if search else "" }}" />
       </form>
 
-      <div class="tasks configure">
+      <div class="event-list configure">
       {% for task in taskdefs() %}
-        <div class="task">
+        <div class="event">
           <h4>
             <a
               href="/{{ task.name }}/configure"
-              class="manage btn btn-default btn-lg"
-            >Configure task</a>
+              class="btn btn-primary btn-sm pull-right"
+            >
+              Configure task
+              <i class="fa fa-caret-right"></i>
+            </a>
             {{ task.description }}
           </h4>
+          <div class="clearfix"></div>
         </div>
       {% endfor %}
       </div>

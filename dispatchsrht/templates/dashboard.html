@@ -3,11 +3,10 @@
 <div class="container">
   <div class="row">
     <div class="col-md-4">
-      <h2>dispatch</h2>
       <p>
         Welcome back, {{ current_user.username }}!
-        This service allows you to integrate various sr.ht services with each
-        other or with external services.
+        This is the {{cfg("sr.ht", "site-name")}} dispatch service.
+        Documentation for this has yet to be written.
       </p>
       <div class="alert alert-danger">
         <strong>Warning!</strong> This is tool is very WIP. Many things do not
@@ -15,8 +14,11 @@
       </div>
       <a
         href="/configure"
-        class="btn btn-default btn-block"
-      >Configure new task</a>
+        class="btn btn-primary btn-block"
+      >
+        Configure new task
+        <i class="fa fa-caret-right"></i>
+      </a>
     </div>
     <div class="col-md-8">
       {% if not any(tasks) %}
@@ -33,14 +35,13 @@
           value="{{ search if search else "" }}" />
       </form>
 
-      <div class="tasks">
+      <div class="event-list">
         {% for task in tasks %}
-        <div class="task">
+        <div class="event">
           <h4>
-            <a class="manage btn btn-default btn-sm" href="#">
-              Manage
+            <a href="#">
+              {{ task.name }}
             </a>
-            {{ task.name }}
           </h4>
           <p>
             {{ task.taskdef.description }}

@@ -21,20 +21,23 @@
           value="{{ search if search else "" }}" />
       </form>
 
-      <div class="tasks configure">
+      <div class="event-list configure">
       {% for repo in repos %}
-        <form class="task" method="POST">
+        <form class="event" method="POST">
           <input type="hidden" name="repo" value="{{ repo.full_name }}" />
           <h4>
             <i class="fa fa-github"></i>
             {% if repo.full_name not in existing %}
             <button
               type="submit"
-              class="manage btn btn-default btn-lg"
-            >Add task</button>
+              class="pull-right btn btn-primary btn-lg"
+            >
+              Add task
+              <i class="fa fa-caret-right"></i>
+            </button>
             {% else %}
             <button
-              class="manage btn btn-default btn-lg"
+              class="pull-right btn btn-default btn-lg"
               disabled
             >Already configured</button>
             {% endif %}
