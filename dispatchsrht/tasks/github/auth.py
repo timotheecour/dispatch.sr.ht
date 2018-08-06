@@ -136,6 +136,7 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
     manifest.triggers.append(Trigger({
         "action": "webhook",
         "condition": "always",
+        "username": hook.user.username,
         "url": complete_url,
     }))
     resp = requests.post(_builds_sr_ht + "/api/jobs", json={
@@ -179,7 +180,7 @@ def github_complete_build(payload):
     result = json.loads(request.data.decode('utf-8'))
     commit.create_status(
         "success" if result["status"] == "success" else "failure",
-        _builds_sr_ht + "/job/" + str(result["id"]),
+        "{}/~{}/{}".format(_builds_sr_ht, payload["username"], result["id"]),
         "builds.sr.ht job {}".format(
             "completed successfully" if result["status"] == "success"
                 else "failed"),
