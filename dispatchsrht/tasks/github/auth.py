@@ -153,7 +153,8 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
     if resp.status_code != 200:
         return resp.text
     build_id = resp.json()["id"]
-    build_url = _builds_sr_ht + "/job/" + str(build_id)
+    build_url = "{}/~{}/job/{}".format(
+            _builds_sr_ht, auth.user.username, build_id)
     status = base_commit.create_status("pending", build_url,
             "builds.sr.ht job is running", context="builds.sr.ht")
     return "Started build: " + build_url
