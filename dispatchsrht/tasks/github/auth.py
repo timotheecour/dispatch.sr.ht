@@ -181,7 +181,7 @@ def github_complete_build(payload):
     result = json.loads(request.data.decode('utf-8'))
     commit.create_status(
         "success" if result["status"] == "success" else "failure",
-        "{}/~{}/{}".format(_builds_sr_ht, payload["username"], result["id"]),
+        "{}/~{}/job/{}".format(_builds_sr_ht, payload["username"], result["id"]),
         "builds.sr.ht job {}".format(
             "completed successfully" if result["status"] == "success"
                 else "failed"),
