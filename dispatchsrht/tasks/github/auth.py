@@ -131,7 +131,7 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
     ]
     status = base_commit.create_status("pending", _builds_sr_ht,
             "preparing builds.sr.ht job", context="builds.sr.ht")
-    complete_url = completion_url(base.full_name, auth.username,
+    complete_url = completion_url(base.full_name, auth.user.username,
             auth.oauth_token, commit.sha)
     manifest.triggers.append(Trigger({
         "action": "webhook",
