@@ -136,7 +136,6 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
     manifest.triggers.append(Trigger({
         "action": "webhook",
         "condition": "always",
-        "username": hook.user.username,
         "url": complete_url,
     }))
     resp = requests.post(_builds_sr_ht + "/api/jobs", json={
@@ -163,6 +162,7 @@ def completion_url(full_name, oauth_token, sha):
     complete_request = {
         "full_name": full_name,
         "oauth_token": oauth_token,
+        "username": hook.user.username,
         "sha": sha,
     }
     complete_payload = _fernet.encrypt(
