@@ -131,8 +131,8 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
     ]
     status = base_commit.create_status("pending", _builds_sr_ht,
             "preparing builds.sr.ht job", context="builds.sr.ht")
-    complete_url = completion_url(base.full_name, auth.oauth_token,
-            commit.sha)
+    complete_url = completion_url(base.full_name, auth.username,
+            auth.oauth_token, commit.sha)
     manifest.triggers.append(Trigger({
         "action": "webhook",
         "condition": "always",
@@ -158,11 +158,11 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
             "builds.sr.ht job is running", context="builds.sr.ht")
     return "Started build: " + build_url
 
-def completion_url(full_name, oauth_token, sha):
+def completion_url(full_name, username, oauth_token, sha):
     complete_request = {
         "full_name": full_name,
         "oauth_token": oauth_token,
-        "username": hook.user.username,
+        "username": username,
         "sha": sha,
     }
     complete_payload = _fernet.encrypt(
