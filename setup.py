@@ -29,6 +29,7 @@ setup(
           'templates/*.html',
           'templates/github/*.html',
           'static/*',
+          'static/icons/*',
       ]
   }
 )
