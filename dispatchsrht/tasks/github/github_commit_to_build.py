@@ -7,28 +7,30 @@ from jinja2 import Markup
 from uuid import UUID, uuid4
 from srht.database import Base, db
 from srht.config import cfg
+from srht.flask import icon
 from srht.validation import Validation
 from dispatchsrht.tasks import TaskDef
-from dispatchsrht.tasks.github.auth import githubloginrequired, GitHubAuthorization
+from dispatchsrht.tasks.github.auth import GitHubAuthorization
+from dispatchsrht.tasks.github.auth import githubloginrequired
 from dispatchsrht.tasks.github.auth import submit_build
 from dispatchsrht.types import Task
 
-_root = "{}://{}".format(cfg("server", "protocol"), cfg("server", "domain"))
-_builds_sr_ht = cfg("network", "builds", default=None)
-_github_client_id = cfg("github", "oauth-client-id", default=None)
-_github_client_secret = cfg("github", "oauth-client-secret", default=None)
+_root = cfg("dispatch.sr.ht", "origin")
+_builds_sr_ht = cfg("builds.sr.ht", "origin", default=None)
+_github_client_id = cfg("dispatch.sr.ht::github",
+        "oauth-client-id", default=None)
+_github_client_secret = cfg("dispatch.sr.ht::github",
+        "oauth-client-secret", default=None)
 
 class GitHubCommitToBuild(TaskDef):
     name = "github_commit_to_build"
-    description = Markup('''
-        <i class="fa fa-github"></i>
-        GitHub commits
-        <i class="fa fa-arrow-right"></i>
-        builds.sr.ht jobs
-    ''')
     enabled = bool(_github_client_id
             and _github_client_secret
             and _builds_sr_ht)
+
+    def description():
+        return (icon("github") + Markup(" GitHub commits ") +
+            icon("caret-right") + Markup(" builds.sr.ht jobs"))
 
     class _GitHubCommitToBuildRecord(Base):
         __tablename__ = "github_commit_to_build"

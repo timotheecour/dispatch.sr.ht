@@ -15,10 +15,7 @@
       <a
         href="/configure"
         class="btn btn-primary btn-block"
-      >
-        Configure new task
-        <i class="fa fa-caret-right"></i>
-      </a>
+      >Configure new task {{icon("caret-right")}}</a>
     </div>
     <div class="col-md-8">
       {% if not any(tasks) %}
@@ -44,7 +41,7 @@
             </a>
           </h4>
           <p>
-            {{ task.taskdef.description }}
+            {{ task.taskdef.description() }}
           </p>
         </div>
         {% endfor %}

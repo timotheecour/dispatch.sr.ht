@@ -1,13 +1,13 @@
 from flask import Blueprint, render_template
 from flask_login import current_user
 from srht.config import cfg
-from dispatchsrht.decorators import loginrequired
+from srht.flask import loginrequired
 from dispatchsrht.types import Task
 import requests
 
 html = Blueprint('html', __name__)
 
-meta_uri = cfg("network", "meta")
+meta_uri = cfg("meta.sr.ht", "origin")
 
 @html.route("/")
 def index():

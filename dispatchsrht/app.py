@@ -1,59 +1,58 @@
-from flask import render_template, request
-from flask_login import LoginManager, current_user
-from jinja2 import Markup
-import locale
-import urllib
-
-from srht.config import cfg, cfgi, load_config
-load_config("dispatch")
+from srht.flask import SrhtFlask
+from srht.config import cfg
 from srht.database import DbSession
-db = DbSession(cfg("sr.ht", "connection-string"))
+
+db = DbSession(cfg("dispatch.sr.ht", "connection-string"))
+
 from dispatchsrht.types import User
+
 db.init()
 
-from srht.flask import SrhtFlask
-app = SrhtFlask("dispatch", __name__)
-app.secret_key = cfg("server", "secret-key")
-login_manager = LoginManager()
-login_manager.init_app(app)
+class DispatchApp(SrhtFlask):
+    def __init__(self):
+        super().__init__("dispatch.sr.ht", __name__)
 
-@login_manager.user_loader
-def load_user(username):
-    return User.query.filter(User.username == username).first()
+        from dispatchsrht.blueprints.html import html
+        self.register_blueprint(html)
 
-login_manager.anonymous_user = lambda: None
+        meta_client_id = cfg("dispatch.sr.ht", "oauth-client-id")
+        meta_client_secret = cfg("dispatch.sr.ht", "oauth-client-secret")
+        builds_sr_ht = cfg("builds.sr.ht", "oauth-client-id")
+        self.configure_meta_auth(meta_client_id, meta_client_secret,
+                base_scopes=["profile", "keys"] + [
+                    builds_sr_ht + "/jobs:write"
+                ] if builds_sr_ht else [])
 
-try:
-    locale.setlocale(locale.LC_ALL, 'en_US')
-except:
-    pass
+        @self.login_manager.user_loader
+        def user_loader(username):
+            # TODO: Switch to a session token
+            return User.query.filter(User.username == username).one_or_none()
 
-builds_sr_ht = cfg("builds.sr.ht", "oauth-client-id")
+        @self.context_processor
+        def inject():
+            from dispatchsrht.tasks import taskdefs
+            return { "taskdefs": taskdefs }
 
-def oauth_url(return_to):
-    return "{}/oauth/authorize?client_id={}&scopes=profile{}&state={}".format(
-        meta_sr_ht, meta_client_id,
-        "," + builds_sr_ht + "/jobs:write" if builds_sr_ht else "",
-        urllib.parse.quote_plus(return_to))
+    def register_tasks(self):
+        # This is done in a separate step because we can't import these right
+        # away due to a circular dependency on the app variable
+        from dispatchsrht.tasks import taskdefs
+        for taskdef in taskdefs():
+            self.register_blueprint(taskdef.blueprint,
+                    url_prefix="/" + taskdef.name)
 
-from dispatchsrht.blueprints.html import html
-from dispatchsrht.blueprints.auth import auth
+    def lookup_or_register(self, exchange, profile, scopes):
+        user = User.query.filter(User.username == profile["username"]).first()
+        if not user:
+            user = User()
+            db.session.add(user)
+        user.username = profile.get("username")
+        user.email = profile.get("email")
+        user.oauth_token = exchange["token"]
+        user.oauth_token_expires = exchange["expires"]
+        user.oauth_token_scopes = scopes
+        db.session.commit()
+        return user
 
-app.register_blueprint(html)
-app.register_blueprint(auth)
-
-from dispatchsrht.tasks import taskdefs
-for taskdef in taskdefs():
-    app.register_blueprint(taskdef.blueprint, url_prefix="/" + taskdef.name)
-
-meta_sr_ht = cfg("network", "meta")
-meta_client_id = cfg("meta.sr.ht", "oauth-client-id")
-
-@app.context_processor
-def inject():
-    return {
-        "oauth_url": oauth_url(request.full_path),
-        "current_user": User.query.filter(User.id == current_user.id).first() \
-                if current_user else None,
-        "taskdefs": taskdefs
-    }
+app = DispatchApp()
+app.register_tasks()

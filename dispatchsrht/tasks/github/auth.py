@@ -13,9 +13,9 @@ from flask_login import current_user
 from functools import wraps
 from github import Github, GithubException
 from urllib.parse import urlencode
-from srht.database import Base, db
 from srht.config import cfg
-from dispatchsrht.decorators import loginrequired
+from srht.database import Base, db
+from srht.flask import loginrequired
 from dispatchsrht.app import app
 
 def _first_line(text):
@@ -23,8 +23,10 @@ def _first_line(text):
         return text
     return text[:text.index("\n") + 1]
 
-_github_client_id = cfg("github", "oauth-client-id", default=None)
-_github_client_secret = cfg("github", "oauth-client-secret", default=None)
+_github_client_id = cfg("dispatch.sr.ht::github",
+        "oauth-client-id", default=None)
+_github_client_secret = cfg("dispatch.sr.ht::github",
+        "oauth-client-secret", default=None)
 
 class GitHubAuthorization(Base):
     __tablename__ = "github_authorization"
@@ -92,9 +94,9 @@ def github_callback():
     db.session.commit()
     return redirect(state)
 
-_root = "{}://{}".format(cfg("server", "protocol"), cfg("server", "domain"))
-_builds_sr_ht = cfg("network", "builds", default=None)
-_secret_key = cfg("server", "secret-key")
+_root = cfg("dispatch.sr.ht", "origin")
+_builds_sr_ht = cfg("builds.sr.ht", "origin", default=None)
+_secret_key = cfg("sr.ht", "secret-key")
 _kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,

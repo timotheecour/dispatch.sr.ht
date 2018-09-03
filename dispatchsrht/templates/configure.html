@@ -26,10 +26,9 @@
               href="/{{ task.name }}/configure"
               class="btn btn-primary btn-sm pull-right"
             >
-              Configure task
-              <i class="fa fa-caret-right"></i>
+              Configure task {{icon("caret-right")}}
             </a>
-            {{ task.description }}
+            {{ task.description() }}
           </h4>
           <div class="clearfix"></div>
         </div>

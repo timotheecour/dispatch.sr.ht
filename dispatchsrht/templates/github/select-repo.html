@@ -26,15 +26,12 @@
         <form class="event" method="POST">
           <input type="hidden" name="repo" value="{{ repo.full_name }}" />
           <h4>
-            <i class="fa fa-github"></i>
+            {{icon("github")}}
             {% if repo.full_name not in existing %}
             <button
               type="submit"
               class="pull-right btn btn-primary btn-lg"
-            >
-              Add task
-              <i class="fa fa-caret-right"></i>
-            </button>
+            >Add task {{icon("caret-right")}}</button>
             {% else %}
             <button
               class="pull-right btn btn-default btn-lg"
@@ -46,7 +43,7 @@
               href="{{ repo.html_url }}"
               target="_blank"
               rel="noopener"
-            ><i class="fa fa-external-link"></i></a>
+            >{{icon("external-link-alt")}}</a>
           </h4>
         </form>
       {% endfor %}
