@@ -120,53 +120,74 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
     commit = repo.get_commit(sha)
     base_commit = base.get_commit(sha)
     git_commit = commit.commit
-    manifest = repo.get_contents(".build.yml", ref=git_commit.sha)
-    if not manifest:
-        return "There's no build manifest in this repository"
-    manifest = base64.b64decode(manifest.content)
-    from buildsrht.manifest import Manifest, Trigger
-    manifest = Manifest(yaml.safe_load(manifest))
-    manifest.sources = [
-        source if not source.endswith("/" + repo.name) else
-            repo.clone_url + "#" + git_commit.sha
-        for source in manifest.sources
-    ]
-    status = base_commit.create_status("pending", _builds_sr_ht,
-            "preparing builds.sr.ht job", context="builds.sr.ht")
-    complete_url = completion_url(base.full_name, auth.user.username,
-            auth.oauth_token, commit.sha)
-    manifest.triggers.append(Trigger({
-        "action": "webhook",
-        "condition": "always",
-        "url": complete_url,
-    }))
-    resp = requests.post(_builds_sr_ht + "/api/jobs", json={
-        "manifest": yaml.dump(manifest.to_dict(), default_flow_style=False),
-        "note": "{}\n\n[{}]({}) &mdash; [{}](mailto:{})".format(
-            html.escape(_first_line(git_commit.message)),
-            str(git_commit.sha)[:7], commit.url,
-            git_commit.author.name,
-            git_commit.author.email,
-        ),
-        "secrets": secrets,
-    }, headers={
-        "Authorization": "token " + hook.user.oauth_token,
-    })
-    if resp.status_code != 200:
-        return resp.text
-    build_id = resp.json()["id"]
-    build_url = "{}/~{}/job/{}".format(
-            _builds_sr_ht, auth.user.username, build_id)
-    status = base_commit.create_status("pending", build_url,
-            "builds.sr.ht job is running", context="builds.sr.ht")
-    return "Started build: " + build_url
+    try:
+        manifest = repo.get_contents(".build.yml", ref=git_commit.sha)
+    except GithubException:
+        manifest = None
+    if manifest is not None:
+        manifests = [manifest]
+    else:
+        try:
+            manifests = repo.get_dir_contents(
+                    ".builds", ref=git_commit.sha) or []
+            manifests = [repo.get_contents(m.path, ref=git_commit.sha)
+                    for m in manifests]
+        except GithubException:
+            manifests = []
+    if not manifests:
+        return "There are no build manifest in this repository"
+    build_urls = []
+    for manifest in manifests:
+        name = manifest.name
+        manifest = base64.b64decode(manifest.content)
+        from buildsrht.manifest import Manifest, Trigger
+        manifest = Manifest(yaml.safe_load(manifest))
+        manifest.sources = [
+            source if not source.endswith("/" + repo.name) else
+                repo.clone_url + "#" + git_commit.sha
+            for source in manifest.sources
+        ]
+        context = "builds.sr.ht" + (f":{name}" if name else "")
+        status = base_commit.create_status("pending", _builds_sr_ht,
+                "preparing builds.sr.ht job", context=context)
+        complete_url = completion_url(base.full_name, auth.user.username,
+                auth.oauth_token, commit.sha, context)
+        manifest.triggers.append(Trigger({
+            "action": "webhook",
+            "condition": "always",
+            "url": complete_url,
+        }))
+        resp = requests.post(_builds_sr_ht + "/api/jobs", json={
+            "manifest": yaml.dump(manifest.to_dict(), default_flow_style=False),
+            "tags": [repo.name] + ([name] if name else []),
+            "note": "{}\n\n[{}]({}) &mdash; [{}](mailto:{})".format(
+                html.escape(_first_line(git_commit.message)),
+                str(git_commit.sha)[:7], commit.url,
+                git_commit.author.name,
+                git_commit.author.email,
+            ),
+            "secrets": secrets,
+        }, headers={
+            "Authorization": "token " + hook.user.oauth_token,
+        })
+        if resp.status_code != 200:
+            return resp.text
+        build_id = resp.json()["id"]
+        build_url = "{}/~{}/job/{}".format(
+                _builds_sr_ht, auth.user.username, build_id)
+        status = base_commit.create_status("pending", build_url,
+                "builds.sr.ht job is running",
+                context=context)
+        build_urls.append(build_url)
+    return "Started builds:\n\n" + "\n".join(build_urls)
 
-def completion_url(full_name, username, oauth_token, sha):
+def completion_url(full_name, username, oauth_token, sha, context):
     complete_request = {
         "full_name": full_name,
         "oauth_token": oauth_token,
         "username": username,
         "sha": sha,
+        "context": context,
     }
     complete_payload = _fernet.encrypt(
             json.dumps(complete_request).encode()).decode()
@@ -181,11 +202,12 @@ def github_complete_build(payload):
     repo = github.get_repo(payload["full_name"])
     commit = repo.get_commit(payload["sha"])
     result = json.loads(request.data.decode('utf-8'))
+    context = payload.get("context")
     commit.create_status(
         "success" if result["status"] == "success" else "failure",
         "{}/~{}/job/{}".format(_builds_sr_ht, payload["username"], result["id"]),
         "builds.sr.ht job {}".format(
             "completed successfully" if result["status"] == "success"
                 else "failed"),
-        context="builds.sr.ht")
+        context=context)
     return "Sent build status to GitHub"
