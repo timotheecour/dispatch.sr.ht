@@ -45,9 +45,28 @@ class GitHubPRToBuild(TaskDef):
         task = sa.orm.relationship("Task")
         repo = sa.Column(sa.Unicode(1024), nullable=False)
         github_webhook_id = sa.Column(sa.Integer, nullable=False)
+        automerge = sa.Column(sa.Boolean, nullable=False, server_default='f')
 
     blueprint = Blueprint("github_pr_to_build",
             __name__, template_folder="github_pr_to_build")
+
+    def edit_GET(task):
+        record = GitHubPRToBuild._GitHubPRToBuildRecord.query.filter(
+            GitHubPRToBuild._GitHubPRToBuildRecord.task_id == task.id
+        ).one_or_none()
+        if not record:
+            abort(404)
+        return render_template("github/edit.html", task=task, record=record)
+
+    def edit_POST(task):
+        record = GitHubPRToBuild._GitHubPRToBuildRecord.query.filter(
+            GitHubPRToBuild._GitHubPRToBuildRecord.task_id == task.id
+        ).one_or_none()
+        valid = Validation(request)
+        automerge = valid.optional("automerge", cls=bool, default=False)
+        record.automerge = bool(automerge)
+        db.session.commit()
+        return redirect(url_for("html.edit_task", task_id=task.id))
 
     @blueprint.route("/webhook/<record_id>", methods=["POST"])
     def _webhook(record_id):

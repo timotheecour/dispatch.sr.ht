@@ -45,16 +45,35 @@ class GitHubCommitToBuild(TaskDef):
         task = sa.orm.relationship("Task")
         repo = sa.Column(sa.Unicode(1024), nullable=False)
         github_webhook_id = sa.Column(sa.Integer, nullable=False)
+        secrets = sa.Column(sa.Boolean, nullable=False, server_default='t')
 
     blueprint = Blueprint("github_commit_to_build",
             __name__, template_folder="github_commit_to_build")
+
+    def edit_GET(task):
+        record = GitHubCommitToBuild._GitHubCommitToBuildRecord.query.filter(
+            GitHubCommitToBuild._GitHubCommitToBuildRecord.task_id == task.id
+        ).one_or_none()
+        if not record:
+            abort(404)
+        return render_template("github/edit.html", task=task, record=record)
+
+    def edit_POST(task):
+        record = GitHubCommitToBuild._GitHubCommitToBuildRecord.query.filter(
+            GitHubCommitToBuild._GitHubCommitToBuildRecord.task_id == task.id
+        ).one_or_none()
+        valid = Validation(request)
+        secrets = valid.optional("secrets", cls=bool, default=False)
+        record.secrets = bool(secrets)
+        db.session.commit()
+        return redirect(url_for("html.edit_task", task_id=task.id))
 
     @blueprint.route("/webhook/<record_id>", methods=["POST"])
     def _webhook(record_id):
         record_id = UUID(record_id)
         hook = GitHubCommitToBuild._GitHubCommitToBuildRecord.query.filter(
                 GitHubCommitToBuild._GitHubCommitToBuildRecord.id == record_id
-            ).first()
+            ).one_or_none()
         if not hook:
             return "Unknown hook " + str(record_id), 404
         valid = Validation(request)
@@ -62,7 +81,7 @@ class GitHubCommitToBuild(TaskDef):
         repo = valid.require("repository")
         if not valid.ok:
             return "Got request, but it has no commits"
-        return submit_build(hook, repo, commit)
+        return submit_build(hook, repo, commit, secrets=hook.secrets)
 
     @blueprint.route("/configure")
     @githubloginrequired

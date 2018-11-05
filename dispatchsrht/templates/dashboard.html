@@ -36,7 +36,7 @@
         {% for task in tasks %}
         <div class="event">
           <h4>
-            <a href="#">
+            <a href="{{url_for("html.edit_task", task_id=task.id)}}">
               {{ task.name }}
             </a>
           </h4>

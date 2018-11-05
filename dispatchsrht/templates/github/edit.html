@@ -1,0 +1,66 @@
+<form method="POST">
+  <p>
+    Submits build manifests from
+    <a
+        href="https://github.com/{{record.repo}}"
+        target="_blank"
+        rel="nofollow noopener"
+    >{{icon("github")}} {{record.repo}}</a>
+    for every
+    {% if task._taskdef == "github_commit_to_build" %}
+      commit.
+    {% else %}
+      pull request.
+    {% endif %}
+    If your repo has a <code>.build.yml</code> file, it will be used as the
+    manifest. If your repo has a <code>.builds</code> directory with several
+    manifests inside, they will all be submitted together.
+  </p>
+  <h3>Options</h3>
+  {% if task._taskdef == "ithub_commit_to_build" %}
+  <div class="form-group">
+    <div class="form-check">
+      <input
+        name="secrets"
+        id="secrets"
+        class="form-check-input"
+        type="checkbox"
+        {{"checked" if record.secrets else ""}}
+      />
+      <label for="secrets" class="form-check-label">
+        Include secrets in builds
+      </label>
+    </div>
+  </div>
+  {% else %}
+  <div class="form-group">
+    <div class="form-check">
+      <input
+        name="automerge"
+        id="automerge"
+        class="form-check-input"
+        type="checkbox"
+        {{"checked" if record.automerge else ""}}
+      />
+      <label class="form-check-label" for="automerge">
+        Automatically merge approved PRs on build success
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" disabled />
+      <label class="form-check-label">
+        <s>Include secrets in builds</s>
+      </label>
+      <small class="form-text text-muted">
+        Secrets are disabled for pull requests.
+      </small>
+    </div>
+  </div>
+  {% endif %}
+  <button type="submit" class="btn btn-primary">
+    Save changes
+    {{icon("caret-right")}}
+  </button>
+</form>

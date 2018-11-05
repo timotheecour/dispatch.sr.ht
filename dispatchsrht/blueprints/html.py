@@ -21,3 +21,26 @@ def index():
 @loginrequired
 def configure():
     return render_template("configure.html")
+
+@html.route("/edit/<task_id>")
+@loginrequired
+def edit_task(task_id):
+    task = Task.query.filter(Task.id == task_id).one_or_none()
+    if not task:
+        abort(404)
+    if task.user_id != current_user.id:
+        abort(401)
+    taskdef = task.taskdef
+    return render_template("configure_task.html",
+            view="summary", task=task, taskdef=taskdef)
+
+@html.route("/edit/<task_id>", methods=["POST"])
+@loginrequired
+def edit_task_POST(task_id):
+    task = Task.query.filter(Task.id == task_id).one_or_none()
+    if not task:
+        abort(404)
+    if task.user_id != current_user.id:
+        abort(401)
+    taskdef = task.taskdef
+    return taskdef.edit_POST(task)
