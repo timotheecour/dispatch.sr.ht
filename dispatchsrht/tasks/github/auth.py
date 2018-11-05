@@ -219,5 +219,8 @@ def github_complete_build(payload):
         requested_reviews = pr.get_review_requests()
         # Don't merge if there are outstanding review requests
         if not any(requested_reviews[0]) and not any(requested_reviews[1]):
-            print(pr.merge())
+            try:
+                pr.merge()
+            except GithubException:
+                return "Unable to merge automatically (failing rules?)"
     return "Sent build status to GitHub"
