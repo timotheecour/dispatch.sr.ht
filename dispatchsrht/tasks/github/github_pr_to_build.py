@@ -87,7 +87,17 @@ class GitHubPRToBuild(TaskDef):
         base = pr["base"]
         base_repo = base["repo"]
         head_repo = head["repo"]
-        return submit_build(hook, head_repo, head, base_repo, secrets=False)
+        auth = GitHubAuthorization.query.filter(
+            GitHubAuthorization.user_id == hook.user_id).first()
+        if not auth:
+            return (
+                "You have not authorized us to access your GitHub account", 401
+            )
+        return submit_build(hook, head_repo, head, base_repo,
+                secrets=False, extras={
+                    "automerge": hook.automerge, 
+                    "pr": pr["number"]
+                })
 
     @blueprint.route("/configure")
     @githubloginrequired

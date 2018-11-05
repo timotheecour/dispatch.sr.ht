@@ -106,7 +106,7 @@ _kdf = PBKDF2HMAC(
 _key = base64.urlsafe_b64encode(_kdf.derive(_secret_key.encode()))
 _fernet = Fernet(_key)
 
-def submit_build(hook, repo, commit, base=None, secrets=True):
+def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
     if base == None:
         base = repo
     auth = GitHubAuthorization.query.filter(
@@ -151,7 +151,7 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
         status = base_commit.create_status("pending", _builds_sr_ht,
                 "preparing builds.sr.ht job", context=context)
         complete_url = completion_url(base.full_name, auth.user.username,
-                auth.oauth_token, commit.sha, context)
+                auth.oauth_token, commit.sha, context, extras)
         manifest.triggers.append(Trigger({
             "action": "webhook",
             "condition": "always",
@@ -181,7 +181,7 @@ def submit_build(hook, repo, commit, base=None, secrets=True):
         build_urls.append(build_url)
     return "Started builds:\n\n" + "\n".join(build_urls)
 
-def completion_url(full_name, username, oauth_token, sha, context):
+def completion_url(full_name, username, oauth_token, sha, context, extras):
     complete_request = {
         "full_name": full_name,
         "oauth_token": oauth_token,
@@ -189,6 +189,7 @@ def completion_url(full_name, username, oauth_token, sha, context):
         "sha": sha,
         "context": context,
     }
+    complete_request.update(extras)
     complete_payload = _fernet.encrypt(
             json.dumps(complete_request).encode()).decode()
     complete_url = _root + url_for("github_complete_build",
@@ -210,4 +211,13 @@ def github_complete_build(payload):
             "completed successfully" if result["status"] == "success"
                 else "failed"),
         context=context)
+    pr = payload.get("pr")
+    if pr:
+        pr = repo.get_pull(pr)
+    automerge = payload.get("automerge")
+    if not pr.is_merged() and automerge and result["status"] == "success":
+        requested_reviews = pr.get_review_requests()
+        # Don't merge if there are outstanding review requests
+        if not any(requested_reviews[0]) and not any(requested_reviews[1]):
+            print(pr.merge())
     return "Sent build status to GitHub"
