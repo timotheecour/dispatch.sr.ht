@@ -13,6 +13,8 @@ setup(
   name = 'dispatchsrht',
   packages = [
       'dispatchsrht',
+      'dispatchsrht.alembic',
+      'dispatchsrht.alembic.versions',
       'dispatchsrht.blueprints',
       'dispatchsrht.tasks',
       'dispatchsrht.tasks.github',
