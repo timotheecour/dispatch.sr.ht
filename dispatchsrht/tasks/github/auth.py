@@ -215,7 +215,7 @@ def github_complete_build(payload):
     if pr:
         pr = repo.get_pull(pr)
     automerge = payload.get("automerge")
-    if not pr.is_merged() and automerge and result["status"] == "success":
+    if pr and not pr.is_merged() and automerge and result["status"] == "success":
         requested_reviews = pr.get_review_requests()
         # Don't merge if there are outstanding review requests
         if not any(requested_reviews[0]) and not any(requested_reviews[1]):
