@@ -142,5 +142,4 @@ class GitHubPRToBuild(TaskDef):
         }, ["pull_request"], active=True)
         record.github_webhook_id = hook.id
         db.session.commit()
-        # TODO: redirect to task page
-        return redirect("/")
+        return redirect(url_for("html.edit_task", task_id=task.id))

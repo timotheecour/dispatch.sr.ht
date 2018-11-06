@@ -43,8 +43,15 @@
         {{"checked" if record.automerge else ""}}
       />
       <label class="form-check-label" for="automerge">
-        Automatically merge approved PRs on build success
+        Automatically merge PRs on build success
       </label>
+      <small class="form-text text-muted">
+        Configuring branch protection rules on GitHub is strongly recommended
+        when using this feature.
+        <a
+          href="https://man.sr.ht/dispatch.sr.ht/github.md"
+        >Read the guide here</a>.
+      </small>
     </div>
   </div>
   <div class="form-group">
