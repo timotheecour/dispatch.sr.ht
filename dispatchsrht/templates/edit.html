@@ -19,7 +19,7 @@
           {{link(url_for("html.edit_task", task_id=task.id), "summary")}}
         </li>
         <li class="nav-item">
-          {{link("#", "delete")}}
+          {{link(url_for("html.delete_task", task_id=task.id), "delete")}}
         </li>
       </ul>
     </div>
@@ -27,9 +27,8 @@
 </div>
 <div class="container">
   <div class="row">
-    <div class="col-md-8">
-      {{taskdef.edit_GET(task)|safe}}
-    </div>
+    {% block content %}
+    {% endblock %}
   </div>
 </div>
 {% endblock %}

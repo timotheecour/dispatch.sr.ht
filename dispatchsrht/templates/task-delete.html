@@ -1,0 +1,18 @@
+{% extends "edit.html" %}
+{% block content %}
+<div class="col-md-12">
+  <p>
+    This will permanently delete the <strong>{{ task.name }}</strong> task.
+    This cannot be undone.
+  </p>
+  <form method="POST">
+    <button type="submit" class="btn btn-danger">
+      Proceed and delete {{icon("caret-right")}}
+    </button>
+    <a
+      href="{{url_for("html.edit_task", task_id=task.id)}}"
+      class="btn btn-default"
+    >Nevermind</a>
+  </form>
+</div>
+{% endblock %}
