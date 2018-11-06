@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask_login import current_user
 from srht.config import cfg
-from srht.flask import loginrequired
+from srht.flask import loginrequired, paginate_query
 from dispatchsrht.types import Task
 import requests
 
@@ -13,9 +13,14 @@ meta_uri = cfg("meta.sr.ht", "origin")
 def index():
     if not current_user:
         return render_template("index.html")
-    # TODO: pagination
-    tasks = Task.query.filter(Task.user_id == current_user.id).all()
-    return render_template("dashboard.html", tasks=tasks)
+    tasks = Task.query.filter(Task.user_id == current_user.id)
+    search = request.args.get("search")
+    if search:
+        tasks = tasks.filter(Task.name.ilike("%" + search + "%"))
+    tasks = tasks.order_by(Task.updated.desc())
+    tasks, pagination = paginate_query(tasks)
+    return render_template("dashboard.html",
+            tasks=tasks, search=search, **pagination)
 
 @html.route("/configure")
 @loginrequired
