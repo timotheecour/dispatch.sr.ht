@@ -142,11 +142,12 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
         manifest = base64.b64decode(manifest.content)
         from buildsrht.manifest import Manifest, Trigger
         manifest = Manifest(yaml.safe_load(manifest))
-        manifest.sources = [
-            source if not source.endswith("/" + repo.name) else
-                repo.clone_url + "#" + git_commit.sha
-            for source in manifest.sources
-        ]
+        if manifest.sources:
+            manifest.sources = [
+                source if not source.endswith("/" + repo.name) else
+                    repo.clone_url + "#" + git_commit.sha
+                for source in manifest.sources
+            ]
         context = "builds.sr.ht" + (f": {name}" if name else "")
         status = base_commit.create_status("pending", _builds_sr_ht,
                 "preparing builds.sr.ht job", context=context)
