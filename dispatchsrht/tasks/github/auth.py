@@ -141,7 +141,10 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
         name = manifest.name
         manifest = base64.b64decode(manifest.content)
         from buildsrht.manifest import Manifest, Trigger
-        manifest = Manifest(yaml.safe_load(manifest))
+        try:
+            manifest = Manifest(yaml.safe_load(manifest))
+        except Exception as ex:
+            return f"There are errors in {name}:\n{str(ex)}", 400
         if manifest.sources:
             manifest.sources = [
                 source if not source.endswith("/" + repo.name) else
