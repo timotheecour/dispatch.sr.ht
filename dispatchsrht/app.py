@@ -24,7 +24,11 @@ class DispatchApp(SrhtFlask):
                 ] if builds_sr_ht else [])
 
         # TODO: make this better
-        self.no_csrf_prefixes += ['/github/complete_build']
+        self.no_csrf_prefixes += [
+            '/github/complete_build',
+            '/github_commit_to_build/webhook',
+            '/github_pr_to_build/webhook',
+        ]
 
         @self.login_manager.user_loader
         def user_loader(username):
