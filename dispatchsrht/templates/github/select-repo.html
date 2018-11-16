@@ -24,6 +24,7 @@
       <div class="event-list configure">
       {% for repo in repos %}
         <form class="event" method="POST">
+          {{csrf_token()}}
           <input type="hidden" name="repo" value="{{ repo.full_name }}" />
           <h4>
             {{icon("github")}}
