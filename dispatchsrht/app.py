@@ -23,6 +23,9 @@ class DispatchApp(SrhtFlask):
                     builds_sr_ht + "/jobs:write"
                 ] if builds_sr_ht else [])
 
+        # TODO: make this better
+        self.no_csrf_prefixes += ['/github/complete_build']
+
         @self.login_manager.user_loader
         def user_loader(username):
             # TODO: Switch to a session token
