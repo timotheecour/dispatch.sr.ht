@@ -2,6 +2,7 @@ import base64
 import html
 import json
 import sqlalchemy as sa
+import re
 import requests
 import yaml
 from cryptography.fernet import Fernet
@@ -161,9 +162,12 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
             "condition": "always",
             "url": complete_url,
         }))
+        repo_name = re.sub(r"[^a-z0-9_.-]", "", repo.name.lower())
+        if name:
+            name = re.sub(r"[^a-z0-9_.-]", "", name.lower())
         resp = requests.post(_builds_sr_ht + "/api/jobs", json={
             "manifest": yaml.dump(manifest.to_dict(), default_flow_style=False),
-            "tags": [repo.name] + ([name] if name else []),
+            "tags": [repo_name] + ([name] if name else []),
             "note": "{}\n\n[{}]({}) &mdash; [{}](mailto:{})".format(
                 html.escape(_first_line(git_commit.message)),
                 str(git_commit.sha)[:7], commit.url,
