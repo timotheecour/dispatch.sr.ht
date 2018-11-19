@@ -69,6 +69,7 @@ def githubloginrequired(f):
     return wrapper
 
 @app.route("/github/callback")
+@loginrequired
 def github_callback():
     code = request.args.get("code")
     state = request.args.get("state")
