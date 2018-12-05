@@ -116,8 +116,12 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
     if not auth:
         return "You have not authorized us to access your GitHub account", 401
     github = Github(auth.oauth_token)
-    repo = github.get_repo(repo["full_name"])
-    base = github.get_repo(base["full_name"])
+    try:
+        repo = github.get_repo(repo["full_name"])
+        base = github.get_repo(base["full_name"])
+    except GitHubException:
+        return ("We can't access your GitHub account. "
+            "Did you revoke our access?"), 401
     sha = commit.get("sha") or commit.get("id")
     commit = repo.get_commit(sha)
     base_commit = base.get_commit(sha)
