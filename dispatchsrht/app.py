@@ -4,7 +4,7 @@ from srht.database import DbSession
 
 db = DbSession(cfg("dispatch.sr.ht", "connection-string"))
 
-from dispatchsrht.types import User
+from dispatchsrht.types import User, UserType
 
 db.init()
 
@@ -49,12 +49,13 @@ class DispatchApp(SrhtFlask):
                     url_prefix="/" + taskdef.name)
 
     def lookup_or_register(self, exchange, profile, scopes):
-        user = User.query.filter(User.username == profile["username"]).first()
+        user = User.query.filter(User.username == profile["name"]).one_or_none()
         if not user:
             user = User()
             db.session.add(user)
-        user.username = profile.get("username")
-        user.email = profile.get("email")
+        user.username = profile["name"]
+        user.email = profile["email"]
+        user.user_type = profile["user_type"]
         user.oauth_token = exchange["token"]
         user.oauth_token_expires = exchange["expires"]
         user.oauth_token_scopes = scopes

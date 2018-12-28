@@ -1,5 +1,15 @@
 import sqlalchemy as sa
+import sqlalchemy_utils as sau
 from srht.database import Base
+from enum import Enum
+
+class UserType(Enum):
+    unconfirmed = "unconfirmed"
+    active_non_paying = "active_non_paying"
+    active_free = "active_free"
+    active_paying = "active_paying"
+    active_delinquent = "active_delinquent"
+    admin = "admin"
 
 class User(Base):
     __tablename__ = 'user'
@@ -11,6 +21,10 @@ class User(Base):
     oauth_token_expires = sa.Column(sa.DateTime, nullable=False)
     oauth_token_scopes = sa.Column(sa.String, nullable=False, default="")
     email = sa.Column(sa.String(256), nullable=False)
+    user_type = sa.Column(
+            sau.ChoiceType(UserType, impl=sa.String()),
+            nullable=False,
+            default=UserType.unconfirmed)
 
     def __repr__(self):
         return '<User {} {}>'.format(self.id, self.username)
