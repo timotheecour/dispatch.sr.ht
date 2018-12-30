@@ -1,27 +1,31 @@
 from srht.flask import SrhtFlask
 from srht.config import cfg
 from srht.database import DbSession
+from srht.oauth import AbstractOAuthService
+from dispatchsrht.types import User
 
 db = DbSession(cfg("dispatch.sr.ht", "connection-string"))
-
-from dispatchsrht.types import User, UserType
-
 db.init()
+
+client_id = cfg("dispatch.sr.ht", "oauth-client-id")
+client_secret = cfg("dispatch.sr.ht", "oauth-client-secret")
+buildssrht = cfg("builds.sr.ht", "oauth-client-id")
+
+class DispatchOAuthService(AbstractOAuthService):
+    def __init__(self):
+        super().__init__(client_id, client_secret,
+            required_scopes=["profile", "keys"] + [
+                buildssrht + "/jobs:write"
+            ] if buildssrht else [],
+            user_class=User)
 
 class DispatchApp(SrhtFlask):
     def __init__(self):
-        super().__init__("dispatch.sr.ht", __name__)
+        super().__init__("dispatch.sr.ht", __name__,
+                oauth_service=DispatchOAuthService())
 
         from dispatchsrht.blueprints.html import html
         self.register_blueprint(html)
-
-        meta_client_id = cfg("dispatch.sr.ht", "oauth-client-id")
-        meta_client_secret = cfg("dispatch.sr.ht", "oauth-client-secret")
-        builds_sr_ht = cfg("builds.sr.ht", "oauth-client-id")
-        self.configure_meta_auth(meta_client_id, meta_client_secret,
-                base_scopes=["profile", "keys"] + [
-                    builds_sr_ht + "/jobs:write"
-                ] if builds_sr_ht else [])
 
         # TODO: make this better
         self.no_csrf_prefixes += [
@@ -29,11 +33,6 @@ class DispatchApp(SrhtFlask):
             '/github_commit_to_build/webhook',
             '/github_pr_to_build/webhook',
         ]
-
-        @self.login_manager.user_loader
-        def user_loader(username):
-            # TODO: Switch to a session token
-            return User.query.filter(User.username == username).one_or_none()
 
         @self.context_processor
         def inject():
@@ -47,20 +46,6 @@ class DispatchApp(SrhtFlask):
         for taskdef in taskdefs():
             self.register_blueprint(taskdef.blueprint,
                     url_prefix="/" + taskdef.name)
-
-    def lookup_or_register(self, exchange, profile, scopes):
-        user = User.query.filter(User.username == profile["name"]).one_or_none()
-        if not user:
-            user = User()
-            db.session.add(user)
-        user.username = profile["name"]
-        user.email = profile["email"]
-        user.user_type = profile["user_type"]
-        user.oauth_token = exchange["token"]
-        user.oauth_token_expires = exchange["expires"]
-        user.oauth_token_scopes = scopes
-        db.session.commit()
-        return user
 
 app = DispatchApp()
 app.register_tasks()
