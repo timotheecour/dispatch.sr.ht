@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+import dispatchsrht.alembic
+from srht.config import cfg
+from srht.database import alembic
+alembic("dispatch.sr.ht", dispatchsrht.alembic)

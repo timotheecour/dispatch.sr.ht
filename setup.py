@@ -33,5 +33,8 @@ setup(
           'static/*',
           'static/icons/*',
       ]
-  }
+  },
+  scripts = [
+      'dispatchsrht-migrate',
+  ],
 )
