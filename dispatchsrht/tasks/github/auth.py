@@ -158,8 +158,11 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
                 for source in manifest.sources
             ]
         context = "builds.sr.ht" + (f": {name}" if name else "")
-        status = base_commit.create_status("pending", _builds_sr_ht,
-                "preparing builds.sr.ht job", context=context)
+        try:
+            status = base_commit.create_status("pending", _builds_sr_ht,
+                    "preparing builds.sr.ht job", context=context)
+        except GithubException:
+            return "Unable to add status to commit", 400
         complete_url = completion_url(base.full_name, auth.user.username,
                 auth.oauth_token, commit.sha, context, extras)
         manifest.triggers.append(Trigger({
