@@ -220,13 +220,16 @@ def github_complete_build(payload):
     commit = repo.get_commit(payload["sha"])
     result = json.loads(request.data.decode('utf-8'))
     context = payload.get("context")
-    commit.create_status(
-        "success" if result["status"] == "success" else "failure",
-        "{}/~{}/job/{}".format(_builds_sr_ht, payload["username"], result["id"]),
-        "builds.sr.ht job {}".format(
-            "completed successfully" if result["status"] == "success"
-                else "failed"),
-        context=context)
+    try:
+        commit.create_status(
+            "success" if result["status"] == "success" else "failure",
+            "{}/~{}/job/{}".format(_builds_sr_ht, payload["username"], result["id"]),
+            "builds.sr.ht job {}".format(
+                "completed successfully" if result["status"] == "success"
+                    else "failed"),
+            context=context)
+    except GitHubException:
+        return "Error updating GitHub status"
     pr = payload.get("pr")
     if pr:
         pr = repo.get_pull(pr)
