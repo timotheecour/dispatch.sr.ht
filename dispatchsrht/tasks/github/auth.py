@@ -178,7 +178,7 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
             "tags": [repo_name] + ([name] if name else []),
             "note": "{}\n\n[{}]({}) &mdash; [{}](mailto:{})".format(
                 html.escape(_first_line(git_commit.message)),
-                str(git_commit.sha)[:7], commit.url,
+                str(git_commit.sha)[:7], commit.html_url,
                 git_commit.author.name,
                 git_commit.author.email,
             ),
