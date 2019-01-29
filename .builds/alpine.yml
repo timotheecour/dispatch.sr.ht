@@ -6,7 +6,6 @@ repositories:
     alpine@sr.ht.rsa.pub
 packages:
   - rsync
-  - xz
 sources:
   - https://git.sr.ht/~sircmpwn/dispatch.sr.ht
   - https://git.sr.ht/~sircmpwn/sr.ht-apkbuilds
