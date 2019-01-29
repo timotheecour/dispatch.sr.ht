@@ -13,7 +13,7 @@ environment:
   project: dispatch.sr.ht
   remote: deploy@mirror.sr.ht
   remote_path: /var/www/mirror.sr.ht/alpine
-  master: dispatch.sr.ht
+  master: deploy@dispatch.sr.ht
 secrets:
   - fa00a8d3-7b63-42d5-8060-3bb31c3e3018 # ssh deploy key
   - d0adc1d4-af78-4852-920f-1134392f5d10 # package signing key
@@ -40,5 +40,5 @@ tasks:
       echo "StrictHostKeyChecking=no" >> ~/.ssh/config
       ./pkgkit upload "$remote" "$remote_path" "$project"
   - deploy: |
-      ssh deploy@$master doas apk upgrade -U
-      ssh deploy@$master doas service $project restart
+      ssh $master doas apk upgrade -U
+      ssh $master doas service $project restart
