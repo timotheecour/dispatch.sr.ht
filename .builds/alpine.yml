@@ -21,7 +21,7 @@ secrets:
 tasks:
   - archive: |
       cd ${project}
-      pkgver=$(~/sources/sr.ht-apkbuilds/pkgkit pkgver)
+      pkgver=$(~/sr.ht-apkbuilds/pkgkit pkgver)
       echo "pkgver=$pkgver" >> ~/.buildenv
       git archive \
         -o ~/sr.ht-apkbuilds/sr.ht/${project}/${project}-$pkgver.tar.gz \
