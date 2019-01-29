@@ -1,0 +1,51 @@
+image: alpine/edge
+repositories:
+  sr.ht: >
+    https://mirror.sr.ht/alpine/sr.ht/
+    https://mirror.sr.ht/alpine/sr.ht/alpine%40sr.ht.rsa.pub
+    alpine@sr.ht.rsa.pub
+packages:
+  - rsync
+  - xz
+sources:
+  - https://git.sr.ht/~sircmpwn/dispatch.sr.ht
+  - https://git.sr.ht/~sircmpwn/sr.ht-apkbuilds
+environment:
+  project: dispatch.sr.ht
+  remote: deploy@mirror.sr.ht
+  remote_path: /var/www/mirror.sr.ht/alpine
+  master: dispatch.sr.ht
+secrets:
+  - fa00a8d3-7b63-42d5-8060-3bb31c3e3018 # ssh deploy key
+  - d0adc1d4-af78-4852-920f-1134392f5d10 # package signing key
+tasks:
+  - archive: |
+      cd ${project}
+      pkgver=$(git describe --abbrev=0)
+      if ! git describe --exact-match HEAD
+      then
+        cdate=$(git show -s -1 --format='%ci' HEAD)
+        cdate=$(echo "$cdate" | cut -d' ' -f1 | sed -e 's/-//g')
+        pkgver="${pkgver}_git${cdate}"
+      fi
+      echo "pkgver=$pkgver" >> ~/.buildenv
+      git archive --prefix=${project}-$pkgver/ HEAD | gzip \
+        > ~/sr.ht-apkbuilds/sr.ht/${project}/${project}-$pkgver.tar.gz
+  - pkgkit: |
+      cd sr.ht-apkbuilds
+      ./pkgkit add-repo -s sr.ht ~/.abuild/alpine@sr.ht.rsa
+      cd sr.ht/$project
+      sed -e 's?::https://git.sr.ht/.*archive.*??g' -i APKBUILD
+  - package: |
+      cd sr.ht-apkbuilds
+      ./pkgkit build -cuv "$pkgver" "$project"
+      cd ~/$project
+      git describe --exact-match HEAD || complete-build
+  - publish: |
+      cd sr.ht-apkbuilds
+      echo "StrictHostKeyChecking=no" >> ~/.ssh/config
+      ./pkgkit upload "$remote" "$remote_path" "$project"
+#  - deploy: |
+#      sshopts="-o StrictHostKeyChecking=no"
+#      ssh $sshopts deploy@$master doas apk upgrade -U
+#      ssh $sshopts deploy@$master doas service dispatch.sr.ht restart
