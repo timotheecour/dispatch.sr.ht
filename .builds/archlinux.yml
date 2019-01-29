@@ -2,55 +2,32 @@ image: archlinux
 repositories:
   sr.ht: https://mirror.sr.ht/archlinux/sr.ht/#1ED4E14494433AE3FD302CAB74B4BCCEA60D0437
 packages:
-  - sassc
-  - python-cryptography
-  - python-setuptools
-  - python-srht
-  - python-pygithub
-  - python-requests
-  - python-flask-login
   - rsync
   - pacman-contrib
 sources:
   - https://git.sr.ht/~sircmpwn/dispatch.sr.ht
   - https://git.sr.ht/~sircmpwn/sr.ht-pkgbuilds
 environment:
-  repo_server: deploy@mirror.sr.ht
-  repo_path: /var/www/mirror.sr.ht/archlinux/sr.ht/
-  master: deploy@dispatch.sr.ht
+  project: dispatch.sr.ht
+  remote: deploy@mirror.sr.ht
+  remote_path: /var/www/mirror.sr.ht/archlinux
+  mailer: deploy@mail.sr.ht
 secrets:
   - fa00a8d3-7b63-42d5-8060-3bb31c3e3018 # ssh deploy key
   - 3e65a1a8-a20f-4f6b-a452-df2ac398bc1e # package signing key
 tasks:
-  - build: |
-      cd dispatch.sr.ht
-      ./setup.py build
   - archive: |
-      cd dispatch.sr.ht
+      cd ${project}
       pkgver=$(git describe | sed -e 's/-/_/g')
       echo "pkgver=$pkgver" >> ~/.buildenv
-      git archive -o ~/sr.ht-pkgbuilds/dispatch.sr.ht/dispatch.sr.ht-$pkgver.tar.xz \
-        --prefix=dispatch.sr.ht-$pkgver/ HEAD
+      git archive -o ~/sr.ht-pkgbuilds/$project/$project-$pkgver.tar.gz \
+        --prefix=$project-$pkgver/ HEAD
   - package: |
-      cd sr.ht-pkgbuilds/dispatch.sr.ht
-      pkgrel=$(pacman -Si dispatch.sr.ht | grep Version | cut -d'-' -f2)
-      pkgrel=$(expr $pkgrel + 1)
-      sed -e "s/pkgver=.*/pkgver=$pkgver/" -i PKGBUILD
-      sed -e "s/pkgrel=.*/pkgrel=$pkgrel/" -i PKGBUILD
-      echo "pkgrel=$pkgrel" >> ~/.buildenv
-      updpkgsums
-      makepkg --config ../makepkg.conf -s --noconfirm
-      cd ~/dispatch.sr.ht
+      cd sr.ht-pkgbuilds
+      ./pkgkit build -cuv "$pkgver" $project
+      cd ~/$project
       git describe --exact-match HEAD || complete-build
-  - deploy: |
-      cd sr.ht-pkgbuilds/dispatch.sr.ht
-      sshopts="-o StrictHostKeyChecking=no"
-      rsync --blocking-io \
-        --rsh="ssh $sshopts" -rP *.pkg.tar.xz{,.sig} $repo_server:$repo_path/
-      ssh $sshopts $repo_server repo-add -n -R \
-        $repo_path/sr.ht.db.tar.gz \
-        $repo_path/dispatch.sr.ht-$pkgver-$pkgrel-any.pkg.tar.xz
-      ssh $sshopts $repo_server repo-add -n -R \
-        $repo_path/sr.ht.db.tar.gz \
-        $repo_path/dispatch.sr.ht-images-$pkgver-$pkgrel-any.pkg.tar.xz
-      ssh $sshopts $master sudo /usr/local/bin/update-srht dispatch.sr.ht
+  - publish: |
+      cd sr.ht-pkgbuilds
+      echo "StrictHostKeyChecking=no" >> ~/.ssh/config
+      ./pkgkit upload "$remote" "$remote_path" sr.ht $project
