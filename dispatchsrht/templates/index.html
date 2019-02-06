@@ -1,17 +1,29 @@
 {% extends "layout.html" %}
-{% block body %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-6">
-      <p>
-        Welcome to dispatch.sr.ht. This is a part of the
-        <a href="{{cfg("meta.sr.ht", "origin")}}">
-          {{cfg("sr.ht", "site-name")}} network
-        </a>
-        and provides integration services to members.
-        <a href="{{ oauth_url }}">Log in</a> to get started.
-      </p>
-    </div>
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <p>
+      Welcome to <strong>{{domain}}</strong>! This provides task dispatching
+      &amp; integration services for
+      <a href="{{cfg("sr.ht", "site-info")}}">
+        {{cfg("sr.ht", "site-name")}}</a>,
+      {{cfg("sr.ht", "site-blurb")}}.
+      Features of this service include:
+    </p>
+    <ul>
+      <li>Automate tasks between various sr.ht services</li>
+      <li>Integrate sr.ht with third-party services like GitHub</li>
+      <li>Reduces the workload for maintainers and contributors</li>
+    </ul>
+    <a
+      class="btn btn-primary"
+      href="{{cfg("meta.sr.ht", "origin")}}/register"
+    >Register here {{icon('caret-right')}}</a>
+    or
+    <a href="{{oauth_url}}">
+      Log in {{icon('caret-right')}}
+    </a>
+    to get started.
   </div>
 </div>
 {% endblock %}

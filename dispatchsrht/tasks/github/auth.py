@@ -16,7 +16,7 @@ from github import Github, GithubException
 from urllib.parse import urlencode
 from srht.config import cfg
 from srht.database import Base, db
-from srht.flask import loginrequired
+from srht.flask import loginrequired, csrf_bypass
 from dispatchsrht.app import app
 
 def _first_line(text):
@@ -212,6 +212,7 @@ def completion_url(full_name, username, oauth_token, sha, context, extras):
             payload=complete_payload)
     return complete_url
 
+@csrf_bypass
 @app.route("/github/complete_build/<payload>", methods=["POST"])
 def github_complete_build(payload):
     payload = json.loads(_fernet.decrypt(payload.encode()).decode())

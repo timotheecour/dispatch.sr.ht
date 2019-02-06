@@ -7,7 +7,7 @@ from jinja2 import Markup
 from uuid import UUID, uuid4
 from srht.database import Base, db
 from srht.config import cfg
-from srht.flask import icon
+from srht.flask import icon, csrf_bypass
 from srht.validation import Validation
 from dispatchsrht.tasks import TaskDef
 from dispatchsrht.tasks.github.auth import GitHubAuthorization
@@ -68,6 +68,7 @@ class GitHubPRToBuild(TaskDef):
         db.session.commit()
         return redirect(url_for("html.edit_task", task_id=task.id))
 
+    @csrf_bypass
     @blueprint.route("/webhook/<record_id>", methods=["POST"])
     def _webhook(record_id):
         record_id = UUID(record_id)

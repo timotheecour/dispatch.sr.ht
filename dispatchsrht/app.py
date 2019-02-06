@@ -27,13 +27,6 @@ class DispatchApp(SrhtFlask):
         from dispatchsrht.blueprints.html import html
         self.register_blueprint(html)
 
-        # TODO: make this better
-        self.no_csrf_prefixes += [
-            '/github/complete_build',
-            '/github_commit_to_build/webhook',
-            '/github_pr_to_build/webhook',
-        ]
-
         @self.context_processor
         def inject():
             from dispatchsrht.tasks import taskdefs
