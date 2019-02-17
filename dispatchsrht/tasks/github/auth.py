@@ -121,7 +121,7 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
         base = github.get_repo(base["full_name"])
         sha = commit.get("sha") or commit.get("id")
         commit = repo.get_commit(sha)
-    except GitHubException:
+    except GithubException:
         return ("We can't access your GitHub account. "
             "Did you revoke our access?"), 401
     base_commit = base.get_commit(sha)
@@ -229,7 +229,7 @@ def github_complete_build(payload):
                 "completed successfully" if result["status"] == "success"
                     else "failed"),
             context=context)
-    except GitHubException:
+    except GithubException:
         return "Error updating GitHub status"
     pr = payload.get("pr")
     if pr:
