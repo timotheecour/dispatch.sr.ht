@@ -119,11 +119,11 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
     try:
         repo = github.get_repo(repo["full_name"])
         base = github.get_repo(base["full_name"])
+        sha = commit.get("sha") or commit.get("id")
+        commit = repo.get_commit(sha)
     except GitHubException:
         return ("We can't access your GitHub account. "
             "Did you revoke our access?"), 401
-    sha = commit.get("sha") or commit.get("id")
-    commit = repo.get_commit(sha)
     base_commit = base.get_commit(sha)
     git_commit = commit.commit
     try:
