@@ -50,8 +50,6 @@ def github_redirect(return_to):
     return redirect("{}?{}".format(gh_authorize_url, urlencode(parameters)))
 
 def githubloginrequired(f):
-    f = loginrequired(f)
-
     @wraps(f)
     def wrapper(*args, **kwargs):
         auth = GitHubAuthorization.query.filter(
@@ -66,7 +64,7 @@ def githubloginrequired(f):
             db.session.delete(auth)
             db.session.commit()
             return github_redirect(request.path)
-    return wrapper
+    return loginrequired(wrapper)
 
 @app.route("/github/callback")
 @loginrequired
