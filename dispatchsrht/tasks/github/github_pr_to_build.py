@@ -101,7 +101,7 @@ class GitHubPRToBuild(TaskDef):
                 }, env={
                     "GITHUB_DELIVERY": request.headers.get("X-GitHub-Delivery"),
                     "GITHUB_EVENT": request.headers.get("X-GitHub-Event"),
-                    "GITHUB_PR_NUMBER": pr["number"],
+                    "GITHUB_PR_NUMBER": str(pr["number"]),
                     "GITHUB_PR_TITLE": pr["title"],
                     "GITHUB_BASE_REPO": base_repo["full_name"],
                     "GITHUB_HEAD_REPO": head_repo["full_name"],
