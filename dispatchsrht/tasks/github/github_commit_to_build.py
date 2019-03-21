@@ -80,9 +80,15 @@ class GitHubCommitToBuild(TaskDef):
         valid = Validation(request)
         commit = valid.require("head_commit")
         repo = valid.require("repository")
+        ref = valid.require("ref")
         if not valid.ok:
             return "Got request, but it has no commits"
-        return submit_build(hook, repo, commit, secrets=hook.secrets)
+        return submit_build(hook, repo, commit, env={
+            "GITHUB_DELIVERY": request.headers.get("X-GitHub-Delivery"),
+            "GITHUB_EVENT": request.headers.get("X-GitHub-Event"),
+            "GITHUB_REF": ref,
+            "GITHUB_REPO": repo["full_name"],
+        }, secrets=hook.secrets)
 
     @blueprint.route("/configure")
     @githubloginrequired

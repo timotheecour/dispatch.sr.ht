@@ -106,7 +106,8 @@ _kdf = PBKDF2HMAC(
 _key = base64.urlsafe_b64encode(_kdf.derive(_secret_key.encode()))
 _fernet = Fernet(_key)
 
-def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
+def submit_build(hook, repo, commit, base=None,
+        secrets=False, env=dict(), extras=dict()):
     if base == None:
         base = repo
     auth = GitHubAuthorization.query.filter(
@@ -168,6 +169,10 @@ def submit_build(hook, repo, commit, base=None, secrets=False, extras=dict()):
             "condition": "always",
             "url": complete_url,
         }))
+        if not manifest.environment:
+            manifest.environment = env
+        else:
+            manifest.environment.update(env)
         repo_name = re.sub(r"[^a-z0-9_.-]", "", repo.name.lower())
         if name:
             name = re.sub(r"[^a-z0-9_.-]", "", name.lower())
