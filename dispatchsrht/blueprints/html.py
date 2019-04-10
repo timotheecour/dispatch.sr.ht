@@ -8,8 +8,6 @@ import requests
 
 html = Blueprint('html', __name__)
 
-meta_uri = cfg("meta.sr.ht", "origin")
-
 @html.route("/")
 def index():
     if not current_user:
