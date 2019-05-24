@@ -28,7 +28,8 @@ else:
             "The $SRHT_PATH environment variable points to an invalid "
             "directory: {}".format(srht_path))
 
-subp = subprocess.run(["make", "SRHT_PATH=" + srht_path])
+make = os.environ.get("MAKE", "make")
+subp = subprocess.run([make, "SRHT_PATH=" + srht_path])
 if subp.returncode != 0:
     sys.exit(subp.returncode)
 
