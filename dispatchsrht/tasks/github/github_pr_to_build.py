@@ -2,6 +2,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils as sau
 from github import Github
 from flask import Blueprint, redirect, request, render_template, url_for, abort
+from flask import session
 from flask_login import current_user
 from jinja2 import Markup
 from uuid import UUID, uuid4
@@ -46,6 +47,8 @@ class GitHubPRToBuild(TaskDef):
         repo = sa.Column(sa.Unicode(1024), nullable=False)
         github_webhook_id = sa.Column(sa.Integer, nullable=False)
         automerge = sa.Column(sa.Boolean, nullable=False, server_default='f')
+        private = sa.Column(sa.Boolean, nullable=False, server_default='f')
+        secrets = sa.Column(sa.Boolean, nullable=False, server_default='f')
 
     blueprint = Blueprint("github_pr_to_build",
             __name__, template_folder="github_pr_to_build")
@@ -56,7 +59,19 @@ class GitHubPRToBuild(TaskDef):
         ).one_or_none()
         if not record:
             abort(404)
-        return render_template("github/edit.html", task=task, record=record)
+        auth = GitHubAuthorization.query.filter(
+            GitHubAuthorization.user_id == current_user.id
+        ).first()
+        github = Github(auth.oauth_token)
+        repo = github.get_repo(record.repo)
+        if repo.private != record.private:
+            record.private = repo.private
+            if not repo.private:
+                record.secrets = False
+            db.session.commit()
+        saved = session.pop("saved", False)
+        return render_template("github/edit.html",
+                task=task, record=record, saved=saved)
 
     def edit_POST(task):
         record = GitHubPRToBuild._GitHubPRToBuildRecord.query.filter(
@@ -64,8 +79,13 @@ class GitHubPRToBuild(TaskDef):
         ).one_or_none()
         valid = Validation(request)
         automerge = valid.optional("automerge", cls=bool, default=False)
+        secrets = valid.optional("secrets", cls=bool, default=False)
         record.automerge = bool(automerge)
+        record.secrets = bool(secrets)
+        if not record.private:
+            record.secrets = False
         db.session.commit()
+        session["saved"] = True
         return redirect(url_for("html.edit_task", task_id=task.id))
 
     @csrf_bypass
@@ -94,8 +114,11 @@ class GitHubPRToBuild(TaskDef):
             return (
                 "You have not authorized us to access your GitHub account", 401
             )
+        secrets = hook.secrets
+        if not base_repo["private"]:
+            secrets = False
         return submit_build(hook, head_repo, head, base_repo,
-                secrets=False, extras={
+                secrets=secrets, extras={
                     "automerge": hook.automerge, 
                     "pr": pr["number"]
                 }, env={
@@ -141,6 +164,7 @@ class GitHubPRToBuild(TaskDef):
         record.task_id = task.id
         record.github_webhook_id = -1
         record.repo = repo.full_name
+        record.private = repo.private
         db.session.add(record)
         db.session.flush()
         hook = repo.create_hook("web", {

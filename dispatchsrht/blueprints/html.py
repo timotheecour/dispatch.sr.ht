@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, abort
+from flask import session
 from flask_login import current_user
 from srht.config import cfg
 from srht.database import db

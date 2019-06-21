@@ -3,4 +3,3 @@ import dispatchsrht.alembic
 import srht.alembic
 from srht.database import alembic
 alembic("dispatch.sr.ht", dispatchsrht.alembic)
-alembic("dispatch.sr.ht", srht.alembic)

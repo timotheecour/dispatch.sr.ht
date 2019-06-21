@@ -56,14 +56,34 @@
     </div>
   </div>
   <div class="form-group">
+    {% if record.private %}
+    <div class="alert alert-danger">
+      <strong>Warning</strong>: Enable secrets for this hook with care. Anyone
+      who can submit a pull request will be able to extract secrets from the
+      build environment if you enable secrets for this repository.
+    </div>
+    {% endif %}
     <div class="form-check">
+      {% if not record.private %}
       <input class="form-check-input" type="checkbox" disabled />
       <label class="form-check-label">
         <s>Include secrets in builds</s>
       </label>
       <small class="form-text text-muted">
-        Secrets are disabled for pull requests.
+        Secrets are disabled for pull requests on public repos.
       </small>
+      {% else %}
+      <input
+        name="secrets"
+        id="secrets"
+        class="form-check-input"
+        type="checkbox"
+        {{"checked" if record.secrets else ""}}
+      />
+      <label for="secrets" class="form-check-label">
+        Include secrets in builds
+      </label>
+      {% endif %}
     </div>
   </div>
   {% endif %}
@@ -72,3 +92,8 @@
     {{icon("caret-right")}}
   </button>
 </form>
+{% if saved %}
+<div class="alert alert-success">
+  Changes saved.
+</div>
+{% endif %}
