@@ -1,6 +1,6 @@
 image: archlinux
 repositories:
-  sr.ht: https://mirror.sr.ht/archlinux/sr.ht/#1ED4E14494433AE3FD302CAB74B4BCCEA60D0437
+  sr.ht: https://mirror.sr.ht/archlinux/sr.ht/#C0AAFC1676BD998617C94C42DC59670F1EB0A189
 packages:
   - rsync
   - pacman-contrib
@@ -13,7 +13,7 @@ environment:
   remote_path: /var/www/mirror.sr.ht/archlinux
 secrets:
   - fa00a8d3-7b63-42d5-8060-3bb31c3e3018 # ssh deploy key
-  - 3e65a1a8-a20f-4f6b-a452-df2ac398bc1e # package signing key
+  - af47c6cd-75b8-4ba8-8086-fb548750160d # package signing key
 tasks:
   - archive: |
       cd ${project}
