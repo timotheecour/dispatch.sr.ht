@@ -141,6 +141,12 @@ def submit_build(hook, repo, commit, base=None,
             manifests = []
     if not manifests:
         return "There are no build manifest in this repository"
+    def source_url(source):
+        if not source.endswith("/" + repo.name):
+            return source
+        if repo.private:
+            return repo.ssh_url + "#" + git_commit.sha
+        return repo.clone_url + "#" + git_commit.sha
     build_urls = []
     for manifest in manifests:
         name = manifest.name
@@ -151,11 +157,7 @@ def submit_build(hook, repo, commit, base=None,
         except Exception as ex:
             return f"There are errors in {name}:\n{str(ex)}", 400
         if manifest.sources:
-            manifest.sources = [
-                source if not source.endswith("/" + repo.name) else
-                    repo.clone_url + "#" + git_commit.sha
-                for source in manifest.sources
-            ]
+            manifest.sources = [source_url(s) for s in manifest.sources]
         context = "builds.sr.ht" + (f": {name}" if name else "")
         try:
             status = base_commit.create_status("pending", _builds_sr_ht,
