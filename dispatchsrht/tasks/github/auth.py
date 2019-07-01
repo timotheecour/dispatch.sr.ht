@@ -142,8 +142,10 @@ def submit_build(hook, repo, commit, base=None,
     if not manifests:
         return "There are no build manifest in this repository"
     def source_url(source):
-        if not source.endswith("/" + repo.name):
+        if not source.endswith("/" + base.name):
             return source
+        if base.name != repo.name:
+            return base.name + "::" + repo.clone_url + "#" + git_commit.sha
         if repo.private:
             return repo.ssh_url + "#" + git_commit.sha
         return repo.clone_url + "#" + git_commit.sha
