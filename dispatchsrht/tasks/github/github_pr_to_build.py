@@ -11,9 +11,9 @@ from srht.config import cfg
 from srht.flask import icon, csrf_bypass
 from srht.validation import Validation
 from dispatchsrht.tasks import TaskDef
-from dispatchsrht.tasks.github.auth import GitHubAuthorization
-from dispatchsrht.tasks.github.auth import githubloginrequired
-from dispatchsrht.tasks.github.auth import submit_github_build
+from dispatchsrht.tasks.github.common import GitHubAuthorization
+from dispatchsrht.tasks.github.common import githubloginrequired
+from dispatchsrht.tasks.github.common import submit_github_build
 from dispatchsrht.types import Task
 
 _root = cfg("dispatch.sr.ht", "origin")
