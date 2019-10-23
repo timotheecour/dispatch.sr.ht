@@ -12,7 +12,7 @@ from srht.validation import Validation
 from dispatchsrht.tasks import TaskDef
 from dispatchsrht.tasks.github.auth import GitHubAuthorization
 from dispatchsrht.tasks.github.auth import githubloginrequired
-from dispatchsrht.tasks.github.auth import submit_build
+from dispatchsrht.tasks.github.auth import submit_github_build
 from dispatchsrht.types import Task
 
 _root = cfg("dispatch.sr.ht", "origin")
@@ -83,7 +83,7 @@ class GitHubCommitToBuild(TaskDef):
         ref = valid.require("ref")
         if not valid.ok:
             return "Got request, but it has no commits"
-        return submit_build(hook, repo, commit, env={
+        return submit_github_build(hook, repo, commit, env={
             "GITHUB_DELIVERY": request.headers.get("X-GitHub-Delivery"),
             "GITHUB_EVENT": request.headers.get("X-GitHub-Event"),
             "GITHUB_REF": ref,

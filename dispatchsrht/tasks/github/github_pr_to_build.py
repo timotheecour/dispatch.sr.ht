@@ -13,7 +13,7 @@ from srht.validation import Validation
 from dispatchsrht.tasks import TaskDef
 from dispatchsrht.tasks.github.auth import GitHubAuthorization
 from dispatchsrht.tasks.github.auth import githubloginrequired
-from dispatchsrht.tasks.github.auth import submit_build
+from dispatchsrht.tasks.github.auth import submit_github_build
 from dispatchsrht.types import Task
 
 _root = cfg("dispatch.sr.ht", "origin")
@@ -117,7 +117,7 @@ class GitHubPRToBuild(TaskDef):
         secrets = hook.secrets
         if not base_repo["private"]:
             secrets = False
-        return submit_build(hook, head_repo, head, base_repo,
+        return submit_github_build(hook, head_repo, head, base_repo,
                 secrets=secrets, extras={
                     "automerge": hook.automerge, 
                     "pr": pr["number"]
