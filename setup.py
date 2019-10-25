@@ -45,6 +45,7 @@ setup(
       'dispatchsrht.blueprints',
       'dispatchsrht.tasks',
       'dispatchsrht.tasks.github',
+      'dispatchsrht.tasks.gitlab',
       'dispatchsrht.types',
   ],
   version = ver,
@@ -57,6 +58,7 @@ setup(
       'dispatchsrht': [
           'templates/*.html',
           'templates/github/*.html',
+          'templates/gitlab/*.html',
           'static/*',
           'static/icons/*',
       ]
