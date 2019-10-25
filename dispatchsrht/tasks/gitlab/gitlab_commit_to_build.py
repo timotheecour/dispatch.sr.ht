@@ -16,7 +16,7 @@ from uuid import UUID, uuid4
 
 _root = cfg("dispatch.sr.ht", "origin")
 _builds_sr_ht = cfg("builds.sr.ht", "origin", default=None)
-_gitlab_enabled = cfgb("dispatch.sr.ht::gitlab", "enabled")
+_gitlab_enabled = cfgb("dispatch.sr.ht::gitlab", "enabled", default=False)
 
 if _gitlab_enabled:
     from gitlab import Gitlab
