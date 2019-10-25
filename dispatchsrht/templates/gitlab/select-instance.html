@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <h3>Choose a GitLab instance</h3>
+      <p>Which GitLab instance would you like to use?</p>
+      <div class="event-list configure">
+        <div class="event">
+          <h4>
+            {{icon('gitlab')}} {{instance_name(canonical_upstream)}}
+            <a
+              href="{{url_for('.configure_repo_GET', upstream=canonical_upstream)}}"
+              class="btn btn-primary btn-lg pull-right"
+            >Continue with {{canonical_upstream}} {{icon('caret-right')}}</a>
+          </h4>
+        </div>
+      </div>
+      <details>
+        <summary>Choose another instance...</summary>
+        <div class="event-list configure">
+          {% for upstream in upstreams %}
+          <div class="event">
+            <h4>
+              {{icon('gitlab')}} {{upstream}}
+              <a
+                href="{{url_for('.configure_repo_GET', upstream=upstream)}}"
+                class="btn btn-primary btn-lg pull-right"
+              >Continue with {{upstream}} {{icon('caret-right')}}</a>
+            </h4>
+          </div>
+          {% endfor %}
+          <p>
+            Is your instance missing? Gitlab instances have to be manually
+            approved by the {{cfg('sr.ht', 'site-name')}} administrators.
+            Send an email to
+            <a
+              href="mailto:{{cfg('sr.ht', 'owner-email')}}"
+            >{{cfg('sr.ht', 'owner-name')}} &lt;{{cfg('sr.ht', 'owner-email')}}&gt;</a>
+            to request yours.
+          </p>
+        </div>
+      </details>
+      <div class="alert alert-danger" style="margin-top: 1rem">
+        <strong>Notice:</strong> By proceeding, you will be granting
+        {{cfg("sr.ht", "site-name")}} full access to your GitLab account.
+        This is a limitation of the GitLab API; we cannot request narrower
+        permissions.
+      </div>
+    </div>
+    <div class="col-md-4">
+      <p>
+        This task will run a builds.sr.ht job for each commit pushed to a
+        GitLab repository. The location of build manifests in your GitLab
+        repository is compatible with git.sr.ht.
+      </p>
+      <a
+        href="https://man.sr.ht/builds.sr.ht/#gitsrht"
+        target="_blank"
+        class="btn btn-link"
+      >Read the documentation {{icon('caret-right')}}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

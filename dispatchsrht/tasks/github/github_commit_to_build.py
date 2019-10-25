@@ -1,19 +1,19 @@
 import sqlalchemy as sa
 import sqlalchemy_utils as sau
-from github import Github
-from flask import Blueprint, redirect, request, render_template, url_for, abort
-from flask_login import current_user
-from jinja2 import Markup
-from uuid import UUID, uuid4
-from srht.database import Base, db
-from srht.config import cfg
-from srht.flask import icon, csrf_bypass
-from srht.validation import Validation
 from dispatchsrht.tasks import TaskDef
 from dispatchsrht.tasks.github.common import GitHubAuthorization
 from dispatchsrht.tasks.github.common import githubloginrequired
 from dispatchsrht.tasks.github.common import submit_github_build
 from dispatchsrht.types import Task
+from flask import Blueprint, redirect, request, render_template, url_for, abort
+from flask_login import current_user
+from github import Github
+from jinja2 import Markup
+from srht.config import cfg
+from srht.database import Base, db
+from srht.flask import icon, csrf_bypass
+from srht.validation import Validation
+from uuid import UUID, uuid4
 
 _root = cfg("dispatch.sr.ht", "origin")
 _builds_sr_ht = cfg("builds.sr.ht", "origin", default=None)

@@ -44,6 +44,7 @@ def submit_build(
         build_tag: str,
         manifests: Iterable[Tuple[str, Manifest]],
         oauth_token: str,
+        username: str,
         note: str=None,
         secrets: bool=False,
         preparing: Callable[[str], Any]=None,
@@ -81,6 +82,9 @@ def submit_build(
         if resp.status_code != 200:
             return resp.text
         build_id = resp.json()["id"]
+        build_url = "{}/~{}/job/{}".format(
+                _builds_sr_ht, username, build_id)
+        build_urls.append((name, build_url))
         if submitted:
-            build_urls.append(submitted(name, build_id))
-    return "Started builds:\n\n" + "\n".join(build_urls)
+            submitted(name, build_id)
+    return build_urls

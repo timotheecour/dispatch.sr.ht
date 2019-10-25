@@ -1,20 +1,20 @@
 import base64
 import html
 import json
-import sqlalchemy as sa
 import requests
+import sqlalchemy as sa
 import yaml
+from dispatchsrht.app import app
+from dispatchsrht.builds import decrypt_notify_payload, submit_build
+from dispatchsrht.builds import first_line, encrypt_notify_url
 from flask import redirect, request, url_for
 from flask_login import current_user
 from functools import wraps
 from github import Github, GithubException
-from urllib.parse import urlencode
 from srht.config import cfg
 from srht.database import Base, db
 from srht.flask import loginrequired, csrf_bypass
-from dispatchsrht.app import app
-from dispatchsrht.builds import first_line, encrypt_notify_url
-from dispatchsrht.builds import decrypt_notify_payload, submit_build
+from urllib.parse import urlencode
 
 _github_client_id = cfg("dispatch.sr.ht::github",
         "oauth-client-id", default=None)
@@ -112,14 +112,13 @@ def update_preparing(base_commit):
 
 def update_submitted(base_commit, username):
     def go(name, build_id):
-        build_url = "{}/~{}/job/{}".format(
-                _builds_sr_ht, username, build_id)
         try:
+            build_url = "{}/~{}/job/{}".format(
+                    _builds_sr_ht, username, build_id)
             base_commit.create_status("pending", build_url,
                     "builds.sr.ht job is running", context=context(name))
-            return build_url
         except GithubException:
-            return ""
+            pass
     return go
 
 def submit_github_build(hook, repo, commit, base=None,
@@ -199,10 +198,14 @@ def submit_github_build(hook, repo, commit, base=None,
             git_commit.author.name,
             git_commit.author.email)
 
-    return submit_build(repo.name, manifests, hook.user.oauth_token,
+    urls = submit_build(repo.name, manifests,
+            hook.user.oauth_token, hook.user.username,
             note=note, secrets=secrets,
             preparing=update_preparing(base_commit),
             submitted=update_submitted(base_commit, auth.user.username))
+    if isinstance(urls, str):
+        return urls
+    return "Submitted:\n\n" + "\n".join([f"{n}: {u}" for n, u in urls])
 
 @csrf_bypass
 @app.route("/github/complete_build/<payload>", methods=["POST"])

@@ -2,31 +2,15 @@
 {% block body %}
 <div class="container">
   <div class="row">
-    <div class="col-md-4">
-      <p>
-        This task will run a builds.sr.ht job for each commit pushed to a
-        GitHub repository. The repository should provide the build manifest in
-        the same manner as a git.sr.ht repo (<a
-         href="https://man.sr.ht/builds.sr.ht/#gitsrht">docs</a>).
-      </p>
-    </div>
     <div class="col-md-8">
-      <form>
-        <input
-          name="search"
-          type="text"
-          placeholder="Search your GitHub repos"
-          class="form-control"
-          value="{{ search if search else "" }}" />
-      </form>
-
+      <h3>Choose a GitLab project</h3>
       <div class="event-list configure">
       {% for repo in repos %}
         <form class="event" method="POST">
           {{csrf_token()}}
-          <input type="hidden" name="repo" value="{{ repo.full_name }}" />
+          <input type="hidden" name="repo_id" value="{{ repo.id }}" />
           <h4>
-            {{icon("github")}}
+            {{icon("gitlab")}}
             {% if repo.full_name not in existing %}
             <button
               type="submit"
@@ -38,15 +22,28 @@
               disabled
             >Already configured</button>
             {% endif %}
-            {{ repo.full_name }}
+            {{ repo.attributes['name_with_namespace'] }}
             <a
-              href="{{ repo.html_url }}"
+              href="{{ repo.attributes['web_url'] }}"
               target="_blank"
               rel="noopener"
             >{{icon("external-link-alt")}}</a>
           </h4>
         </form>
       {% endfor %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <p>
+        This task will run a builds.sr.ht job for each commit pushed to a
+        GitLab repository. The location of build manifests in your GitLab
+        repository is compatible with git.sr.ht.
+      </p>
+      <a
+        href="https://man.sr.ht/builds.sr.ht/#gitsrht"
+        target="_blank"
+        class="btn btn-link"
+      >Read the documentation {{icon('caret-right')}}</a>
     </div>
   </div>
 </div>

@@ -1,0 +1,79 @@
+{# vim: set ft=htmldjango : #}
+<form method="POST">
+  {{csrf_token()}}
+  <p>
+    Submits build manifests from
+    <a
+      href="{{record.web_url}}"
+      target="_blank"
+      rel="nofollow noopener"
+    >{{icon("gitlab")}} {{record.repo_name}}</a>
+    for every
+    {% if task._taskdef == "gitlab_commit_to_build" %}
+      commit.
+    {% else %}
+      merge request.
+    {% endif %}
+    If your repo has a <code>.build.yml</code> file, it will be used as the
+    manifest. If your repo has a <code>.builds</code> directory with several
+    manifests inside, they will all be submitted together.
+  </p>
+  <h3>Options</h3>
+  {% if task._taskdef == "gitlab_commit_to_build" %}
+  <div class="form-group">
+    <div class="form-check">
+      <input
+        name="secrets"
+        id="secrets"
+        class="form-check-input"
+        type="checkbox"
+        {{"checked" if record.secrets else ""}}
+      />
+      <label for="secrets" class="form-check-label">
+        Include secrets in builds
+      </label>
+    </div>
+  </div>
+  {% else %}
+  <div class="form-group">
+    {% if record.private %}
+    <div class="alert alert-danger">
+      <strong>Warning</strong>: Enable secrets for this hook with care. Anyone
+      who can submit a pull request will be able to extract secrets from the
+      build environment if you enable secrets for this repository.
+    </div>
+    {% endif %}
+    <div class="form-check">
+      {% if not record.private %}
+      <input class="form-check-input" type="checkbox" disabled />
+      <label class="form-check-label">
+        <s>Include secrets in builds</s>
+      </label>
+      <small class="form-text text-muted">
+        Secrets are disabled for merge requests on public repos.
+      </small>
+      {% else %}
+      <input
+        name="secrets"
+        id="secrets"
+        class="form-check-input"
+        type="checkbox"
+        {{"checked" if record.secrets else ""}}
+      />
+      <label for="secrets" class="form-check-label">
+        Include secrets in builds
+      </label>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  <button type="submit" class="btn btn-primary">
+    Save changes
+    {{icon("caret-right")}}
+  </button>
+</form>
+{% if saved %}
+<div class="alert alert-success">
+  Changes saved.
+</div>
+{% endif %}

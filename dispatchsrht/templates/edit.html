@@ -3,9 +3,9 @@
 <title>Configure {{ task.name }} - dispatch.sr.ht</title>
 {% endblock %}
 {% block body %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12 header-tabbed">
+<div class="header-tabbed">
+  <div class="container">
+    <ul class="nav nav-tabs">
       <h2>
         {{task.name}}
       </h2>
@@ -14,15 +14,13 @@
         class="nav-link {% if view == title %}active{% endif %}"
         href="{{ path }}">{{ title }}</a>
       {% endmacro %}
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          {{link(url_for("html.edit_task", task_id=task.id), "summary")}}
-        </li>
-        <li class="nav-item">
-          {{link(url_for("html.delete_task", task_id=task.id), "delete")}}
-        </li>
-      </ul>
-    </div>
+      <li class="nav-item">
+        {{link(url_for("html.edit_task", task_id=task.id), "summary")}}
+      </li>
+      <li class="nav-item">
+        {{link(url_for("html.delete_task", task_id=task.id), "delete")}}
+      </li>
+    </ul>
   </div>
 </div>
 <div class="container">
