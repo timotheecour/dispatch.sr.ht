@@ -1,8 +1,8 @@
-image: alpine/3.9
+image: alpine/3.10
 repositories:
   sr.ht: >
-    https://mirror.sr.ht/alpine/sr.ht/
-    https://mirror.sr.ht/alpine/sr.ht/alpine%40sr.ht.rsa.pub
+    https://mirror.sr.ht/alpine/v3.10/sr.ht/
+    https://mirror.sr.ht/alpine/alpine%40sr.ht.rsa.pub
     alpine@sr.ht.rsa.pub
 packages:
   - rsync
