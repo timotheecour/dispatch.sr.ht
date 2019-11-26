@@ -63,7 +63,11 @@ class GitHubPRToBuild(TaskDef):
             GitHubAuthorization.user_id == current_user.id
         ).first()
         github = Github(auth.oauth_token)
-        repo = github.get_repo(record.repo)
+        try:
+            repo = github.get_repo(record.repo)
+        except github.GithubException.UnknownObjectException:
+            return render_template("github/missing.html",
+                    task=task, record=record)
         if repo.private != record.private:
             record.private = repo.private
             if not repo.private:

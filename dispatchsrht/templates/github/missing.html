@@ -1,0 +1,15 @@
+{% extends "edit.html" %}
+{% block content %}
+<div class="col-md-12">
+  <p>
+    The repository associated with this task has been deleted, or is no longer
+    visible to us. Would you like to delete this task?
+  </p>
+  <form method="POST" action="{{url_for('html.delete_task', task_id=task.id)}}">
+    {{csrf_token()}}
+    <button type="submit" class="btn btn-danger">
+      Delete task {{icon("caret-right")}}
+    </button>
+  </form>
+</div>
+{% endblock %}
