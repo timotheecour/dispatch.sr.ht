@@ -7,11 +7,11 @@ from dispatchsrht.app import app
 from dispatchsrht.builds import encrypt_notify_url, first_line, submit_build
 from dispatchsrht.builds import decrypt_notify_payload
 from flask import abort, redirect, render_template, request, url_for
-from flask_login import current_user
 from functools import wraps
 from srht.config import cfg, cfgb
 from srht.database import Base, db
-from srht.flask import csrf_bypass, loginrequired
+from srht.flask import csrf_bypass
+from srht.oauth import current_user, loginrequired
 from urllib.parse import urlencode
 
 _root = cfg("dispatch.sr.ht", "origin")

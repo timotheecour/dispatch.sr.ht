@@ -13,7 +13,8 @@ from typing import Any, Callable, Dict, Iterable, Tuple
 
 _root = cfg("dispatch.sr.ht", "origin")
 _builds_sr_ht = cfg("builds.sr.ht", "origin", default=None)
-_secret_key = cfg("sr.ht", "secret-key")
+_secret_key = cfg("sr.ht", "service-key",
+        default=cfg("sr.ht", "secret-key", default=None))
 _kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,

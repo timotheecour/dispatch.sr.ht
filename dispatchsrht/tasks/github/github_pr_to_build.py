@@ -3,12 +3,12 @@ import sqlalchemy_utils as sau
 from github import Github
 from flask import Blueprint, redirect, request, render_template, url_for, abort
 from flask import session
-from flask_login import current_user
 from jinja2 import Markup
 from uuid import UUID, uuid4
 from srht.database import Base, db
 from srht.config import cfg
 from srht.flask import icon, csrf_bypass
+from srht.oauth import current_user
 from srht.validation import Validation
 from dispatchsrht.tasks import TaskDef
 from dispatchsrht.tasks.github.common import GitHubAuthorization

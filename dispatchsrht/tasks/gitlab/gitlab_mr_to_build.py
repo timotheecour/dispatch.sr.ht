@@ -6,11 +6,11 @@ from dispatchsrht.tasks.gitlab.common import submit_gitlab_build
 from dispatchsrht.tasks import TaskDef
 from dispatchsrht.types import Task
 from flask import Blueprint, redirect, render_template, request, url_for
-from flask_login import current_user
 from jinja2 import Markup
 from srht.config import cfg, cfgb, cfgkeys
 from srht.database import Base, db
-from srht.flask import icon, csrf_bypass, loginrequired
+from srht.flask import icon, csrf_bypass
+from srht.oauth import current_user, loginrequired
 from srht.validation import Validation
 from uuid import UUID, uuid4
 

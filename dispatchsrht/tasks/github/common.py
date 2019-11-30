@@ -8,12 +8,12 @@ from dispatchsrht.app import app
 from dispatchsrht.builds import decrypt_notify_payload, submit_build
 from dispatchsrht.builds import first_line, encrypt_notify_url
 from flask import redirect, request, url_for
-from flask_login import current_user
 from functools import wraps
 from github import Github, GithubException
 from srht.config import cfg
 from srht.database import Base, db
-from srht.flask import loginrequired, csrf_bypass
+from srht.flask import csrf_bypass
+from srht.oauth import current_user, loginrequired
 from urllib.parse import urlencode
 
 _github_client_id = cfg("dispatch.sr.ht::github",

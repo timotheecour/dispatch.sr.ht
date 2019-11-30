@@ -6,12 +6,12 @@ from dispatchsrht.tasks.github.common import githubloginrequired
 from dispatchsrht.tasks.github.common import submit_github_build
 from dispatchsrht.types import Task
 from flask import Blueprint, redirect, request, render_template, url_for, abort
-from flask_login import current_user
 from github import Github
 from jinja2 import Markup
 from srht.config import cfg
 from srht.database import Base, db
 from srht.flask import icon, csrf_bypass
+from srht.oauth import current_user
 from srht.validation import Validation
 from uuid import UUID, uuid4
 
