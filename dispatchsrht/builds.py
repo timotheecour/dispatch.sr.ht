@@ -44,8 +44,7 @@ def decrypt_notify_payload(payload):
 def submit_build(
         build_tag: str,
         manifests: Iterable[Tuple[str, Manifest]],
-        oauth_token: str,
-        username: str,
+        user,
         note: str=None,
         secrets: bool=False,
         preparing: Callable[[str], Any]=None,
@@ -56,7 +55,7 @@ def submit_build(
 
     @build_tag:      Build tag for this set of manifests, usually a repo name
     @manifests:      List of build manifests to submit and their names
-    @oauth_token:    The user's builds.sr.ht-authorized OAuth token
+    @user:           The dispatch.sr.ht user record submitting the build
     @note:           Note to add to build submission, e.g. commit message
     @secrets:        Whether to enable secrets for this build
     @preparing:      A callable called when each manifest is being prepared
@@ -77,14 +76,12 @@ def submit_build(
             "tags": [build_tag] + ([name] if name else []),
             "note": note,
             "secrets": secrets,
-        }, headers={
-            "Authorization": "token " + oauth_token,
-        })
+        }, headers=get_authorization(user))
         if resp.status_code != 200:
             return resp.text
         build_id = resp.json()["id"]
         build_url = "{}/~{}/job/{}".format(
-                _builds_sr_ht, username, build_id)
+                _builds_sr_ht, user.username, build_id)
         build_urls.append((name, build_url))
         if submitted:
             submitted(name, build_id)

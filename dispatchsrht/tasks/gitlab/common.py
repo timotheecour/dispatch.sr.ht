@@ -213,8 +213,7 @@ def submit_gitlab_build(auth, hook, project, commit,
             commit.attributes["committer_email"])
 
     return submit_build(project.attributes['name'], manifests,
-            hook.user.oauth_token, hook.user.username,
-            note=note, secrets=hook.secrets,
+            hook.user, note=note, secrets=hook.secrets,
             preparing=update_preparing(commit),
             submitted=update_submitted(commit, auth.user.username))
 

@@ -199,8 +199,7 @@ def submit_github_build(hook, repo, commit, base=None,
             git_commit.author.email)
 
     urls = submit_build(repo.name, manifests,
-            hook.user.oauth_token, hook.user.username,
-            note=note, secrets=secrets,
+            hook.user, note=note, secrets=secrets,
             preparing=update_preparing(base_commit),
             submitted=update_submitted(base_commit, auth.user.username))
     if isinstance(urls, str):
