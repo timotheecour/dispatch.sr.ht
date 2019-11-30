@@ -8,6 +8,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from flask import url_for
+from srht.api import get_authorization
 from srht.config import cfg
 from typing import Any, Callable, Dict, Iterable, Tuple
 
