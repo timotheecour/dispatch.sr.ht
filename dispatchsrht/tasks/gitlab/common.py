@@ -12,7 +12,7 @@ from srht.config import cfg, cfgb
 from srht.database import Base, db
 from srht.flask import csrf_bypass
 from srht.oauth import current_user, loginrequired
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 _root = cfg("dispatch.sr.ht", "origin")
 _builds_sr_ht = cfg("builds.sr.ht", "origin", default=None)
@@ -117,7 +117,8 @@ def source_url(project, commit, url, source):
         return project.attributes['ssh_url_to_repo'] + "#" + commit.get_id()
     return project.attributes['http_url_to_repo'] + "#" + commit.get_id()
 
-context = lambda name: "builds.sr.ht" + (f": {name}" if name else "")
+context = lambda name: urlparse(_builds_sr_ht).netloc + (f": {name}" if name else "")
+
 
 def update_preparing(commit):
     def go(name):

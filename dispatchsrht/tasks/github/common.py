@@ -14,7 +14,7 @@ from srht.config import cfg
 from srht.database import Base, db
 from srht.flask import csrf_bypass
 from srht.oauth import current_user, loginrequired
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 _github_client_id = cfg("dispatch.sr.ht::github",
         "oauth-client-id", default=None)
@@ -90,7 +90,8 @@ def github_callback():
     db.session.commit()
     return redirect(state)
 
-context = lambda name: "builds.sr.ht" + (f": {name}" if name else "")
+context = lambda name: urlparse(_builds_sr_ht).netloc + (f": {name}" if name else "")
+
 
 def source_url(repo, base, git_commit, source):
     if not source.endswith("/" + base.name):
