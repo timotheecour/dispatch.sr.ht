@@ -11,7 +11,7 @@
           <input type="hidden" name="repo_id" value="{{ repo.id }}" />
           <h4>
             {{icon("gitlab")}}
-            {% if repo.full_name not in existing %}
+            {% if repo.id not in existing %}
             <button
               type="submit"
               class="pull-right btn btn-primary btn-lg"

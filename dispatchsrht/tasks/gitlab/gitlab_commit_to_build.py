@@ -88,7 +88,7 @@ class GitLabCommitToBuild(TaskDef):
         existing = GitLabCommitToBuild._GitLabCommitToBuildRecord.query.filter(
                 GitLabCommitToBuild._GitLabCommitToBuildRecord.user_id == current_user.id,
                 GitLabCommitToBuild._GitLabCommitToBuildRecord.upstream == upstream).all()
-        existing = [e.repo for e in existing]
+        existing = [e.repo_id for e in existing]
         return render_template("gitlab/select-repo.html",
                 repos=repos, existing=existing)
 
