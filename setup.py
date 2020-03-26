@@ -64,6 +64,7 @@ setup(
       ]
   },
   scripts = [
+      'dispatchsrht-initdb',
       'dispatchsrht-migrate',
   ],
 )

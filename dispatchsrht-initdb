@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+"""
+Create the initial database schema and stamp the `head` revision.
+
+The target database needs to exist, as defined in the config file.
+
+Idempotent. If the tables already exist, they will not be re-created.
+"""
+import dispatchsrht.alembic
+import dispatchsrht.types
+
+from alembic import command
+from alembic.config import Config
+from srht.config import cfg
+from srht.database import DbSession
+
+connection_string = cfg("dispatch.sr.ht", "connection-string")
+alembic_path = list(dispatchsrht.alembic.__path__)[0]
+
+db = DbSession(connection_string)
+db.create()
+
+config = Config()
+config.set_main_option("sqlalchemy.url", connection_string)
+config.set_main_option("script_location", alembic_path)
+command.stamp(config, "head")
