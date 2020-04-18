@@ -157,8 +157,11 @@ class GitLabCommitToBuild(TaskDef):
         if not valid.ok:
             return "Unexpected hook payload"
 
-        project = gitlab.projects.get(hook.repo_id)
-        commit = project.commits.get(commit)
+        try:
+            project = gitlab.projects.get(hook.repo_id)
+            commit = project.commits.get(commit)
+        except:
+            return "Unable to fetch commit information"
 
         urls = submit_gitlab_build(auth, hook, project, commit, env={
             "GITLAB_REF": ref,
