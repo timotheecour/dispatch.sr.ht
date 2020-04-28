@@ -6,6 +6,7 @@ from dispatchsrht.tasks.github.common import githubloginrequired
 from dispatchsrht.tasks.github.common import submit_github_build
 from dispatchsrht.types import Task
 from flask import Blueprint, redirect, request, render_template, url_for, abort
+from flask import session
 from github import Github
 from jinja2 import Markup
 from srht.config import cfg
@@ -56,7 +57,9 @@ class GitHubCommitToBuild(TaskDef):
         ).one_or_none()
         if not record:
             abort(404)
-        return render_template("github/edit.html", task=task, record=record)
+        saved = session.pop("saved", False)
+        return render_template("github/edit.html", task=task, record=record,
+                               saved=saved)
 
     def edit_POST(task):
         record = GitHubCommitToBuild._GitHubCommitToBuildRecord.query.filter(
@@ -66,6 +69,7 @@ class GitHubCommitToBuild(TaskDef):
         secrets = valid.optional("secrets", cls=bool, default=False)
         record.secrets = bool(secrets)
         db.session.commit()
+        session["saved"] = True
         return redirect(url_for("html.edit_task", task_id=task.id))
 
     @csrf_bypass
