@@ -147,7 +147,7 @@ def update_submitted(commit, username):
             return ""
     return go
 
-def submit_gitlab_build(auth, hook, project, commit,
+def submit_gitlab_build(tag, auth, hook, project, commit,
         source=None, env=dict(), is_mr=False):
     if source is None:
         source = project
@@ -213,7 +213,7 @@ def submit_gitlab_build(auth, hook, project, commit,
             commit.attributes["committer_name"],
             commit.attributes["committer_email"])
 
-    return submit_build(project.attributes['name'], manifests,
+    return submit_build([project.attributes['name'], tag], manifests,
             hook.user, note=note, secrets=hook.secrets,
             preparing=update_preparing(commit),
             submitted=update_submitted(commit, auth.user.username))

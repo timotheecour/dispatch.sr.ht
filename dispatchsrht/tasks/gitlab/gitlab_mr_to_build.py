@@ -165,7 +165,7 @@ class GitLabMRToBuild(TaskDef):
         commit = project.commits.get(last_commit["id"])
         merge_req = project.mergerequests.get(object_attrs["iid"])
 
-        urls = submit_gitlab_build(auth, hook, project, commit, source, {
+        urls = submit_gitlab_build("mrs", auth, hook, project, commit, source, {
             "GITLAB_MR_NUMBER": object_attrs["iid"],
             "GITLAB_MR_TITLE": object_attrs["title"],
             "GITLAB_BASE_REPO": project.attributes["name_with_namespace"],

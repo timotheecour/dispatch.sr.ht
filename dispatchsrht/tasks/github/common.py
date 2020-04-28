@@ -122,7 +122,7 @@ def update_submitted(base_commit, username):
             pass
     return go
 
-def submit_github_build(hook, repo, commit, base=None,
+def submit_github_build(tag, hook, repo, commit, base=None,
         secrets=False, env=dict(), extras=dict()):
     if base == None:
         base = repo
@@ -199,7 +199,7 @@ def submit_github_build(hook, repo, commit, base=None,
             git_commit.author.name,
             git_commit.author.email)
 
-    urls = submit_build(repo.name, manifests,
+    urls = submit_build([repo.name, tag], manifests,
             hook.user, note=note, secrets=secrets,
             preparing=update_preparing(base_commit),
             submitted=update_submitted(base_commit, auth.user.username))

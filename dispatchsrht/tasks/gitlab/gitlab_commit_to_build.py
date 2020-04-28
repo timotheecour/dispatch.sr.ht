@@ -163,7 +163,7 @@ class GitLabCommitToBuild(TaskDef):
         except:
             return "Unable to fetch commit information"
 
-        urls = submit_gitlab_build(auth, hook, project, commit, env={
+        urls = submit_gitlab_build("commits", auth, hook, project, commit, env={
             "GITLAB_REF": ref,
         })
         if isinstance(urls, str):

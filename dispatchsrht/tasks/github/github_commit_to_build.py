@@ -83,7 +83,7 @@ class GitHubCommitToBuild(TaskDef):
         ref = valid.require("ref")
         if not valid.ok:
             return "Got request, but it has no commits"
-        return submit_github_build(hook, repo, commit, env={
+        return submit_github_build("commits", hook, repo, commit, env={
             "GITHUB_DELIVERY": request.headers.get("X-GitHub-Delivery"),
             "GITHUB_EVENT": request.headers.get("X-GitHub-Event"),
             "GITHUB_REF": ref,

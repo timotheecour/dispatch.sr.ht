@@ -42,8 +42,7 @@ def encrypt_notify_url(route, payload):
 def decrypt_notify_payload(payload):
     return json.loads(_fernet.decrypt(payload.encode()).decode())
 
-def submit_build(
-        build_tag: str,
+def submit_build(build_tag,
         manifests: Iterable[Tuple[str, Manifest]],
         user,
         note: str=None,
@@ -54,7 +53,7 @@ def submit_build(
     Submits a build, or builds, to builds.sr.ht. Returns a user-friendly
     summary of the builds submitted.
 
-    @build_tag:      Build tag for this set of manifests, usually a repo name
+    @build_tag:      Build tags for this set of manifests, usually a repo name
     @manifests:      List of build manifests to submit and their names
     @user:           The dispatch.sr.ht user record submitting the build
     @note:           Note to add to build submission, e.g. commit message
@@ -69,12 +68,12 @@ def submit_build(
     for name, manifest in manifests:
         if preparing:
             preparing(name)
-        build_tag = re.sub(r"[^a-z0-9_.-]", "", build_tag.lower())
+        build_tag = [re.sub(r"[^a-z0-9_.-]", "", bt.lower()) for bt in build_tag]
         if name:
             name = re.sub(r"[^a-z0-9_.-]", "", name.lower())
         resp = requests.post(_builds_sr_ht + "/api/jobs", json={
             "manifest": yaml.dump(manifest.to_dict(), default_flow_style=False),
-            "tags": [build_tag] + ([name] if name else []),
+            "tags": build_tag + ([name] if name else []),
             "note": note,
             "secrets": secrets,
         }, headers=get_authorization(user))

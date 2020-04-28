@@ -121,7 +121,7 @@ class GitHubPRToBuild(TaskDef):
         secrets = hook.secrets
         if not base_repo["private"]:
             secrets = False
-        return submit_github_build(hook, head_repo, head, base_repo,
+        return submit_github_build("pulls", hook, head_repo, head, base_repo,
                 secrets=secrets, extras={
                     "automerge": hook.automerge, 
                     "pr": pr["number"]
