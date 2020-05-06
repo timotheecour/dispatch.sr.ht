@@ -40,7 +40,7 @@ def github_redirect(return_to):
     # TODO: Do we want to generalize the scopes?
     parameters = {
         "client_id": _github_client_id,
-        "scope": "repo:status write:repo_hook user:email repo_deployment read:org",
+        "scope": "repo:status public_repo write:repo_hook user:email repo_deployment read:org",
         "state": return_to,
     }
     return redirect("{}?{}".format(gh_authorize_url, urlencode(parameters)))
